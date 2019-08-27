@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!-- Bootstrap 4 -->
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+	<!-- Amchart 4 -->
+	<script src="https://www.amcharts.com/lib/4/core.js"></script>
+	<script src="https://www.amcharts.com/lib/4/charts.js"></script>
+	<script src="https://www.amcharts.com/lib/4/plugins/forceDirected.js"></script>
+	<script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+	<!-- AOS.js -->
+	<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+	<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+	<!-- Styles -->
+	<style>
+		.img {  
+        width: 250px;
+        height: 125px;
+     /*text-align: 不能再视图中使其居中 css里只能识别这种星号的注释 */
+    		}	
+
+    	.search {
+        margin-top: -1cm;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+        border-color: blue;
+        width: 50%;
+        position:relative;
+   			 }
+
+   		.submit {
+        position:absolute;
+        margin-top: 0cm;
+        top:250px;
+        left:420px;
+        border-color: blue;
+        width: 80px;
+        height: 30px;
+            }
+
+    	.submit2 {
+        position:absolute;
+        margin-top: 0cm;
+        top:250px;
+        left:750px;
+        border-color: blue;
+        width: 150px;
+        height: 30px;
+            }
+    
+
+
+		#section10 a {
+		  padding-top: 60px;
+		}
+		#section10 a span {
+		  position: absolute;
+		  top: 80vh;
+		  left: 50%;
+		  width: 30px;
+		  height: 50px;
+		  margin-left: -15px;
+		  border: 2px solid #000;
+		  border-radius: 50px;
+		  box-sizing: border-box;
+		}
+		#section10 a span::before {
+		  position: absolute;
+		  top: 10px;
+		  left: 50%;
+		  content: '';
+		  width: 6px;
+		  height: 6px;
+		  margin-left: -3px;
+		  background-color: #000;
+		  border-radius: 100%;
+		  -webkit-animation: sdb10 2s infinite;
+		  animation: sdb10 2s infinite;
+		  box-sizing: border-box;
+		}
+		@-webkit-keyframes sdb10 {
+		  0% {
+		    -webkit-transform: translate(0, 0);
+		    opacity: 0;
+		  }
+		  40% {
+		    opacity: 1;
+		  }
+		  80% {
+		    -webkit-transform: translate(0, 20px);
+		    opacity: 0;
+		  }
+		  100% {
+		    opacity: 0;
+		  }
+		}
+		@keyframes sdb10 {
+		  0% {
+		    transform: translate(0, 0);
+		    opacity: 0;
+		  }
+		  40% {
+		    opacity: 1;
+		  }
+		  80% {
+		    transform: translate(0, 20px);
+		    opacity: 0;
+		  }
+		  100% {
+		    opacity: 0;
+		  }
+		}
+
+		#keywordTrendContainer circle {
+
+		}
+	</style>
+</head>
+
+<body>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark " style="background-color: #e3f2fd;">
+    
+    <div class="mx-auto order-0">
+        <a class="navbar-brand mx-auto" href="#">MiMir</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Right</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+	{% load staticfiles %}
+	<!-- Home Page -->
+	<div class="container-fluid" style="height: 100vh;">
+		<div class="row">
+			<div class="col">
+				<img class="img mt-5" src="/static/mimir5.png" style="display:block; margin:auto;"/>
+
+		        <form action=""method="post"> {% csrf_token %}
+		        <input class="search" type="text" name="search"  placeholder="在mimir上搜索或輸入您想要的關鍵字" style="display:block; margin:auto;"/>
+
+		        <input class="submit"  type="submit"value="送出">
+
+		        </form>
+
+		        <input class="submit2" type="button" value="使用產業類別搜尋" onclick="location.href='https://tw.stock.yahoo.com/h/kimosel.php'">
+
+
+				<section id="section10" class="demo">
+				  <a href="#thanks"><span></span></a>
+				</section>
+		
+			</div>
+		</div>
+	</div>
+
+	<!-- Keyword Trend Chart -->
+	<div class="container-fluid bg-light" style="height: 100vh;" id="keywordTrendContainer">
+		<!-- Row 1 -->
+		<div class="row h-100">
+			<div class="col-4 text-center h-100">
+
+				<div class="row justify-content-center flex-column h-100">
+					<div class="col-6 text-center mw-100">
+						<h2 class="mt-5">關鍵字趨勢 -「{{search}}」</h2>
+						<p>透過一段時間的新聞資訊，得知關鍵字的新聞每日變化量。</p>
+					
+					</div>
+					<div class="col-6 text-center mw-100">
+
+
+						<button type="button" class="btn btn-info mr-5" id="Total_btn">Total Chart
+						</button>
+					
+
+						<button type="button" class="btn btn-info" id="Positive_btn">Positive
+						</button>
+
+						<button type="button" class="btn btn-info ml-4" id="Negative_btn">Negative</button>
+						<hr>
+						<form action="" method="">
+							<label >Start Date</label>
+							<input type="date" name="bday" max="3000-12-31" 
+							       min="1000-01-01" class="form-control">
+							<label class="mt-2">End Date</label>
+							<input type="date" name="bday" min="1000-01-01"
+							       max="3000-12-31" class="form-control">
+							<button type="submit" class="btn btn-primary btn-block mt-3">Submit</button>
+						</form>										
+					</div>
+				</div>
+			</div>
+			<div class="col-8 h-100">
+				
+				<!-- keywordTrendChart  HTML -->
+				<div class="h-100" style="display: block;" id="keywordTrendChart">			
+				</div>
+
+				<!-- Positive chart  HTML -->
+				<div class="h-100" style="display: none;" id="PositiveTrendChart" >
+					
+				</div>
+
+				<!-- Negative chart  HTML -->
+				<div class="h-100" style="display: none;" id="NegativeTrendChart" >
+					
+				</div>
+
+
+			</div>
+
+		</div>	
+	</div>
+
+	<!-- Financual Sentiment Chart -->
+	<div class="container-fluid bg-light mt-5" style="height: 100vh;" data-aos="fade-up" data-aos-duration="800">
+		<!-- Row 1 -->
+		<div class="row h-100">
+			<div class="col-4 text-center h-100">
+
+				<div class="row justify-content-center flex-column h-100">
+					<div class="col-10 text-center mw-100">
+						<h1 class="mt-5">金融用字情緒趨勢</h1>
+						<p>判斷資料內容為正面或負面評價。使用機器學習模型訓練出來針對金融用詞的情緒趨勢。</p>
+					</div>
+					<div class="col-2 text-center mw-100">
+						<button type="button" class="btn btn-info">Text Cloud</button>
+						<button type="button" class="btn btn-info ml-5">Bar Chart</button>							
+					</div>
+				</div>
+			</div>
+			<div class="col-8 h-100">
+				<!-- HTML -->
+				<div class="h-100" id="financialSentimentChart"></div>
+			</div>
+		</div>	
+	</div>
+
+	<!-- Normal Sentiment Chart -->
+	<div class="container-fluid bg-light mt-5" style="height: 100vh;" data-aos="fade-up" data-aos-duration="800">
+		<!-- Row 1 -->
+		<div class="row h-100">
+			<div class="col-4 text-center h-100">
+
+				<div class="row justify-content-center flex-column h-100">
+					<div class="col-10 text-center mw-100">
+						<h1 class="mt-5">普通用字情緒趨勢</h1>
+						<p>判斷資料內容為正面或負面評價。使用機器學習模型訓練出來的情緒趨勢。</p>
+					</div>
+					<div class="col-2 text-center mw-100">
+						<button type="button" class="btn btn-info">Text Cloud</button>
+						<button type="button" class="btn btn-info ml-5">Bar Chart</button>							
+					</div>
+				</div>
+			</div>
+			<div class="col-8 h-100">
+				<!-- HTML -->
+				<div class="h-100" id="normalSentimentChart"></div>
+			</div>
+		</div>	
+	</div>
+
+	<!-- Trend Bubble Chart -->
+	<div class="container-fluid bg-light mt-5" style="height: 100vh;" data-aos="fade-up" data-aos-duration="800">
+		<!-- Row 1 -->
+		<div class="row h-100">
+			<div class="col-4 text-center h-100">
+
+				<div class="row justify-content-center flex-column h-100">
+					<div class="col-6 text-center mw-100">
+						<h1 class="mt-5">趨勢泡泡圖</h1>
+						<p>在指定的時間範圍內，把提及最多的公司。</p>
+					</div>
+					<div class="col-4 text-center mw-100">
+						<form action="" method="">
+							<label >Begin voorverkoop periode</label>
+							<input type="date" name="bday" max="3000-12-31" 
+							       min="1000-01-01" class="form-control">
+							<label class="mt-2">Einde voorverkoop periode</label>
+							<input type="date" name="bday" min="1000-01-01"
+							       max="3000-12-31" class="form-control">
+							<button type="submit" class="btn btn-primary btn-block mt-3">Submit</button>
+						</form>			
+					</div>
+				</div>
+			</div>
+			<div class="col-8 h-100">
+				<!-- HTML -->
+				<div class="h-100" id="trendBubbletChart"></div>
+			</div>
+		</div>	
+	</div>
+
+	<!-- Keyword Trend Chart JS -->
+	<script>
+		var data1 = []
+		var dict = {{news_trend_count|safe}};
+
+
+		for (key in dict)
+		{	
+			data1.push({"x":key, "ay":dict[key],"aValue": 10});
+		}
+
+
+
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+		// Create chart instance
+		var chart = am4core.create("keywordTrendChart", am4charts.XYChart);
+		a={{filter_date.1}}
+		// Add data
+		chart.data = data1;
+
+		// Create axes
+		var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
+		xAxis.renderer.minGridDistance = 40;
+
+		// Create value axis
+		var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+		// Create series
+		var series1 = chart.series.push(new am4charts.LineSeries());
+		series1.dataFields.valueX = "x";
+		series1.dataFields.valueY = "ay";
+		series1.dataFields.value = "aValue";
+		series1.strokeWidth = 2;
+		series1.dataFields.url = "url";
+		
+
+		var bullet1 = series1.bullets.push(new am4charts.CircleBullet());
+		series1.heatRules.push({
+		  target: bullet1.circle,
+		  min: 5,
+		  max: 20,
+		  property: "radius"
+		});
+
+		bullet1.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+
+		bullet1.columns.template.interactionsEnabled = true;
+		bullet1.columns.template.events.on(
+		  "hit",
+		  ev => {
+		    var item = ev.target.dataItem.component.tooltipDataItem.dataContext;
+		    alert("line clicked on: Finish" );
+		  },
+		  this
+		);
+
+		// var series2 = chart.series.push(new am4charts.LineSeries());
+		// series2.dataFields.valueX = "x";
+		// series2.dataFields.valueY = "by";
+		// series2.dataFields.value = "bValue";
+		// series2.strokeWidth = 2;
+
+		// var bullet2 = series2.bullets.push(new am4charts.CircleBullet());
+		// series2.heatRules.push({
+		//   target: bullet2.circle,
+		//   min: 5,
+		//   max: 20,
+		//   property: "radius"
+		// });
+
+		// bullet2.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+
+		//scrollbars
+		chart.scrollbarX = new am4core.Scrollbar();
+		chart.scrollbarY = new am4core.Scrollbar();
+
+		}); // end am4core.ready()
+	</script>
+
+	<!-- Financial Chart JS-->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+		// Create chart instance
+		var chart = am4core.create("financialSentimentChart", am4charts.PieChart);
+
+		// Add and configure Series
+		var pieSeries = chart.series.push(new am4charts.PieSeries());
+		pieSeries.dataFields.value = "litres";
+		pieSeries.dataFields.category = "country";
+
+		// Let's cut a hole in our Pie chart the size of 30% the radius
+		chart.innerRadius = am4core.percent(30);
+
+		// Put a thick white border around each Slice
+		pieSeries.slices.template.stroke = am4core.color("#fff");
+		pieSeries.slices.template.strokeWidth = 2;
+		pieSeries.slices.template.strokeOpacity = 1;
+		pieSeries.slices.template
+		  // change the cursor on hover to make it apparent the object can be interacted with
+		  .cursorOverStyle = [
+		    {
+		      "property": "cursor",
+		      "value": "pointer"
+		    }
+		  ];
+
+		pieSeries.alignLabels = false;
+		pieSeries.labels.template.bent = true;
+		pieSeries.labels.template.radius = 3;
+		pieSeries.labels.template.padding(0,0,0,0);
+
+		pieSeries.ticks.template.disabled = true;
+
+		// Create a base filter effect (as if it's not there) for the hover to return to
+		var shadow = pieSeries.slices.template.filters.push(new am4core.DropShadowFilter);
+		shadow.opacity = 0;
+
+		// Create hover state
+		var hoverState = pieSeries.slices.template.states.getKey("hover"); // normally we have to create the hover state, in this case it already exists
+
+		// Slightly shift the shadow and make it more prominent on hover
+		var hoverShadow = hoverState.filters.push(new am4core.DropShadowFilter);
+		hoverShadow.opacity = 0.7;
+		hoverShadow.blur = 5;
+
+		// Add a legend
+		chart.legend = new am4charts.Legend();
+
+		chart.data = 
+		[
+			{
+			  "country": "Positive",
+			  "litres": {{pos_fin_count}}
+			},
+			{
+			  "country": "Negative",
+			  "litres": {{neg_fin_count}}
+			},
+		];
+
+		}); // end am4core.ready()
+	</script>
+
+	<!-- Normal Chart JS-->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+		// Create chart instance
+		var chart = am4core.create("normalSentimentChart", am4charts.PieChart);
+
+		// Add and configure Series
+		var pieSeries = chart.series.push(new am4charts.PieSeries());
+		pieSeries.dataFields.value = "litres";
+		pieSeries.dataFields.category = "country";
+
+		// Let's cut a hole in our Pie chart the size of 30% the radius
+		chart.innerRadius = am4core.percent(30);
+
+		// Put a thick white border around each Slice
+		pieSeries.slices.template.stroke = am4core.color("#fff");
+		pieSeries.slices.template.strokeWidth = 2;
+		pieSeries.slices.template.strokeOpacity = 1;
+		pieSeries.slices.template
+		  // change the cursor on hover to make it apparent the object can be interacted with
+		  .cursorOverStyle = [
+		    {
+		      "property": "cursor",
+		      "value": "pointer"
+		    }
+		  ];
+
+		pieSeries.alignLabels = false;
+		pieSeries.labels.template.bent = true;
+		pieSeries.labels.template.radius = 3;
+		pieSeries.labels.template.padding(0,0,0,0);
+
+		pieSeries.ticks.template.disabled = true;
+
+		// Create a base filter effect (as if it's not there) for the hover to return to
+		var shadow = pieSeries.slices.template.filters.push(new am4core.DropShadowFilter);
+		shadow.opacity = 0;
+
+		// Create hover state
+		var hoverState = pieSeries.slices.template.states.getKey("hover"); // normally we have to create the hover state, in this case it already exists
+
+		// Slightly shift the shadow and make it more prominent on hover
+		var hoverShadow = hoverState.filters.push(new am4core.DropShadowFilter);
+		hoverShadow.opacity = 0.7;
+		hoverShadow.blur = 5;
+
+		// Add a legend
+		chart.legend = new am4charts.Legend();
+
+		chart.data = 
+		[
+			{
+			  "country": "Positive",
+			  "litres": {{pos_count}}
+			},
+			{
+			  "country": "Negative",
+			  "litres": {{neg_count}}
+			},
+		];
+
+		}); // end am4core.ready()
+	</script>
+
+	<!-- Trend Bubble Chart JS -->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+		var chart = am4core.create("trendBubbletChart", am4plugins_forceDirected.ForceDirectedTree);
+		var networkSeries = chart.series.push(new am4plugins_forceDirected.ForceDirectedSeries())
+
+		var data = []
+		var dict = {{company_rank|safe}};
+
+		for (key in dict)
+		{	
+			data.push({"name":key, "value":dict[key]});
+		}
+
+
+		chart.data = data;
+
+		networkSeries.dataFields.value = "value";
+		networkSeries.dataFields.name = "name";
+		networkSeries.dataFields.children = "children";
+		networkSeries.nodes.template.tooltipText = "{name}:{value}";
+		networkSeries.nodes.template.fillOpacity = 1;
+		networkSeries.dataFields.id = "name";
+		networkSeries.dataFields.linkWith = "linkWith";
+
+
+		networkSeries.nodes.template.label.text = "{name}"
+		networkSeries.fontSize = 10;
+
+		var selectedNode;
+
+		var label = chart.createChild(am4core.Label);
+		label.text = "Click on nodes to link"
+		label.x = 50;
+		label.y = 50;
+		label.isMeasured = false;
+
+
+		networkSeries.nodes.template.events.on("up", function (event) {
+		  var node = event.target;
+		  if (!selectedNode) {
+		    node.outerCircle.disabled = false;
+		    node.outerCircle.strokeDasharray = "3,3";
+		    selectedNode = node;
+		  }
+		  else if (selectedNode == node) {
+		    node.outerCircle.disabled = true;
+		    node.outerCircle.strokeDasharray = "";
+		    selectedNode = undefined;
+		  }
+		  else {
+		    var node = event.target;
+
+		    var link = node.linksWith.getKey(selectedNode.uid);
+
+		    if (link) {
+		      node.unlinkWith(selectedNode);
+		    }
+		    else {
+		      node.linkWith(selectedNode, 0.2);
+		    }
+		  }
+		})
+
+		}); // end am4core.ready()
+	</script>
+
+	<script> 
+		AOS.init();
+	</script>
+
+
+
+	<!-- Keyword Trend  Positive  Chart JS -->
+	<script>
+		
+		var data2 = []
+		var dict2 = {{positive_trend_chart|safe}};
+
+		for (key in dict2)
+		{	
+			data2.push({"x":key, "ay":dict2[key],"aValue": 10});
+		}
+
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+		// Create chart instance
+		var chart = am4core.create("PositiveTrendChart", am4charts.XYChart);
+		a={{filter_date.1}}
+		// Add data
+		chart.data = data2;
+
+		// Create axes
+		var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
+		xAxis.renderer.minGridDistance = 40;
+
+		// Create value axis
+		var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+		// Create series
+		var series1 = chart.series.push(new am4charts.LineSeries());
+		series1.dataFields.valueX = "x";
+		series1.dataFields.valueY = "ay";
+		series1.dataFields.value = "aValue";
+		series1.strokeWidth = 2;
+		series1.dataFields.url = "url";
+		
+
+		var bullet1 = series1.bullets.push(new am4charts.CircleBullet());
+		series1.heatRules.push({
+		  target: bullet1.circle,
+		  min: 5,
+		  max: 20,
+		  property: "radius"
+		});
+
+		bullet1.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+
+		bullet1.columns.template.interactionsEnabled = true;
+		bullet1.columns.template.events.on(
+		  "hit",
+		  ev => {
+		    var item = ev.target.dataItem.component.tooltipDataItem.dataContext;
+		    alert("line clicked on: Finish" );
+		  },
+		  this
+		);
+
+		// var series2 = chart.series.push(new am4charts.LineSeries());
+		// series2.dataFields.valueX = "x";
+		// series2.dataFields.valueY = "by";
+		// series2.dataFields.value = "bValue";
+		// series2.strokeWidth = 2;
+
+		// var bullet2 = series2.bullets.push(new am4charts.CircleBullet());
+		// series2.heatRules.push({
+		//   target: bullet2.circle,
+		//   min: 5,
+		//   max: 20,
+		//   property: "radius"
+		// });
+
+		// bullet2.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+
+		//scrollbars
+		chart.scrollbarX = new am4core.Scrollbar();
+		chart.scrollbarY = new am4core.Scrollbar();
+
+		}); // end am4core.ready()
+	</script>
+
+
+	<!-- Keyword Trend  Negative  Chart JS -->
+	<script>
+		var data3 = []
+		var dict3 = {{negative_trend_chart|safe}};
+
+		for (key in dict3)
+		{	
+			data3.push({"x":key, "ay":dict3[key],"aValue": 10});
+		}
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+		// Create chart instance
+		var chart = am4core.create("NegativeTrendChart", am4charts.XYChart);
+
+		// Add data
+		chart.data = data3;
+
+		// Create axes
+		var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
+		xAxis.renderer.minGridDistance = 40;
+
+		// Create value axis
+		var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+
+		// Create series
+		var series1 = chart.series.push(new am4charts.LineSeries());
+		series1.dataFields.valueX = "x";
+		series1.dataFields.valueY = "ay";
+		series1.dataFields.value = "aValue";
+		series1.strokeWidth = 2;
+		series1.dataFields.url = "url";
+		
+
+		var bullet1 = series1.bullets.push(new am4charts.CircleBullet());
+		series1.heatRules.push({
+		  target: bullet1.circle,
+		  min: 5,
+		  max: 20,
+		  property: "radius"
+		});
+
+		bullet1.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+
+		bullet1.columns.template.interactionsEnabled = true;
+		bullet1.columns.template.events.on(
+		  "hit",
+		  ev => {
+		    var item = ev.target.dataItem.component.tooltipDataItem.dataContext;
+		    alert("line clicked on: Finish" );
+		  },
+		  this
+		);
+
+		// var series2 = chart.series.push(new am4charts.LineSeries());
+		// series2.dataFields.valueX = "x";
+		// series2.dataFields.valueY = "by";
+		// series2.dataFields.value = "bValue";
+		// series2.strokeWidth = 2;
+
+		// var bullet2 = series2.bullets.push(new am4charts.CircleBullet());
+		// series2.heatRules.push({
+		//   target: bullet2.circle,
+		//   min: 5,
+		//   max: 20,
+		//   property: "radius"
+		// });
+
+		// bullet2.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+
+		//scrollbars
+		chart.scrollbarX = new am4core.Scrollbar();
+		chart.scrollbarY = new am4core.Scrollbar();
+
+		}); // end am4core.ready()
+	</script>
+
+
+
+
+	<!-- Keyword Trend Chart Three Botton -->
+	
+	<script>
+
+		// First Botton
+		var my_btn1 = document.querySelector('#Total_btn');
+
+		my_btn1.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#keywordTrendChart');
+  		var bk2 = document.querySelector('#PositiveTrendChart');
+  		var bk3 = document.querySelector('#NegativeTrendChart');
+		  if (bk1.style.display == 'none') {
+      		bk1.style.display = 'block';
+      		bk2.style.display = 'none';
+      		bk3.style.display = 'none';
+  		} 
+		}, false);
+
+		// Second Botton
+		var my_btn2 = document.querySelector('#Positive_btn');
+
+		my_btn2.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#keywordTrendChart');
+  		var bk2 = document.querySelector('#PositiveTrendChart');
+  		var bk3 = document.querySelector('#NegativeTrendChart');
+		   if (bk2.style.display == 'none') {
+      		bk2.style.display = 'block';
+      		bk1.style.display = 'none';
+      		bk3.style.display = 'none';
+  		} 
+		}, false);
+		// Third Botton
+		var my_btn3 = document.querySelector('#Negative_btn');
+
+		my_btn3.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#keywordTrendChart');
+  		var bk2 = document.querySelector('#PositiveTrendChart');
+  		var bk3 = document.querySelector('#NegativeTrendChart');
+		   if (bk3.style.display == 'none') {
+      		bk3.style.display = 'block';
+      		bk1.style.display = 'none';
+      		bk2.style.display = 'none';
+  		} 
+		}, false);
+	</script>
+
+
+
+</body>
+</html>

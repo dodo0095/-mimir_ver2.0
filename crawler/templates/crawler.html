@@ -1,0 +1,23 @@
+<!DOCTYPEhtml>
+<htmllang="en">
+
+<head>
+    <metacharset="UTF-8">
+</head>
+<body>
+    <p>要爬取的網頁是 PTT 股市版：</p>
+    <form action="/crawler/POST_crawl/"method="post">{% csrf_token %}
+    	點擊後，開始爬取今日文章<br>
+
+    	<input type="submit"value="開始今日爬蟲"><br><br><br>
+   	</form>
+
+
+    <form action="/crawler/POST_crawl2/"method="post">{% csrf_token %}
+    	點擊後，從股市版第<input type="text" name="start_page"> 頁開始爬取<br>
+    	並且往前 <input type="text" name="how_many_page">  頁 <br>	
+    	<input type="submit"value="開始以前的爬蟲"><br>
+   	</form>
+
+</body>
+</html>

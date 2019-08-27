@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>google</title>
+
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <style type="text/css">
+    /*是让div中的子级元素居中 而不能在视图的本身让其居中*/
+    body {
+        text-align: center;
+    }
+    .img {
+        margin-top: 4cm;
+        width: 200px;
+        height: 100px;
+     /*text-align: 不能再视图中使其居中 css里只能识别这种星号的注释 */
+    }
+    .search {
+        margin-top: 0.5cm;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 5px;
+        border-color: blue;
+        width: 50%;
+        position:relative;
+    }
+
+   .submit {
+        position:absolute;
+        top:390px;
+        left:400px;
+        border-color: blue;
+        width: 80px;
+        height: 30px;
+}
+    }
+
+
+    </style>
+
+</head>
+
+
+<body>
+<!-- 
+# navbar     -->
+<nav class="navbar navbar-expand-md navbar-dark bg-dark " style="background-color: #e3f2fd;">
+    
+    <div class="mx-auto order-0">
+        <a class="navbar-brand mx-auto" href="#">MiMir</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+    </div>
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#">Right</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+
+
+
+
+
+
+
+<!-- 要把img 和input做成两个不同的块级元素 否则会视为一个整体 -->
+<!--当是两个块级元素下一个自动以上一个为尺寸-->
+<div>
+    <!--同一目录之下不能加斜杠 -->
+    <img class="img" src="mimir5.png">
+</div>
+
+<form action="/home/POST_crawl/"method="post"> {% csrf_token %}
+<input class="search" type="text" name="search"  placeholder="在mimir上搜索或輸入您想要的關鍵字">
+
+<input class="submit"  type="submit"value="送出">
+
+
+</form>
+</body>
+</html>
