@@ -16,11 +16,16 @@ Including another URLconf
 from django.contrib import admin
 from django.conf.urls import url
 from django.urls import path,include
-from base.views import hello_view
+from base.views import hello_view,pos_table,neg_table,neg_fin_table,pos_fin_table
 from crawler.views import crawler
 
 urlpatterns = [
 	path('admin/', admin.site.urls),
     path('',hello_view),
+    path("pos_table/",pos_table),
+    path("neg_table/",neg_table),
+    path("neg_fin_table/",neg_fin_table),
+    path("pos_fin_table/",pos_fin_table),
     path('crawler/',include('crawler.urls')),
+
 ]

@@ -16,6 +16,10 @@
 	<!-- AOS.js -->
 	<link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 	<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+	<script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+
 	<!-- Styles -->
 	<style>
 		.img {  
@@ -124,6 +128,7 @@
 </head>
 
 <body>
+
 <nav class="navbar navbar-expand-md navbar-dark bg-dark " style="background-color: #e3f2fd;">
     
     <div class="mx-auto order-0">
@@ -239,14 +244,23 @@
 						<p>判斷資料內容為正面或負面評價。使用機器學習模型訓練出來針對金融用詞的情緒趨勢。</p>
 					</div>
 					<div class="col-2 text-center mw-100">
-						<button type="button" class="btn btn-info">Text Cloud</button>
-						<button type="button" class="btn btn-info ml-5">Bar Chart</button>							
+						<button type="button"  id="pie_chart_btn2" class="btn btn-info mr-5">Pie Chart </button>
+						<button type="button"  id="fin_cloud_word_btn" class="btn btn-info">Word Cloud </button>
+						<button type="button" id="fin_bar_chart_btn" class="btn btn-info ml-5">Bar_Chart</button>							
 					</div>
 				</div>
 			</div>
 			<div class="col-8 h-100">
 				<!-- HTML -->
-				<div class="h-100" id="financialSentimentChart"></div>
+				<div class="h-100" id="financialSentimentChart" style="display: block;"></div>
+				 <!--  word cloud chart -->
+				
+				<div class="h-100 align-self-center" id="Positive_fin_wordcloud" style="display: none; border: 0px solid #eee; height: 580px; width:700px;margin:0 auto;"></div>
+				<div class="h-100 align-self-center" id="Negative_fin_wordcloud" style="display: none; border: 0px solid #eee; height: 580px; width:700px;margin:0 auto;"></div>
+
+				<!-- fin bar chart -->
+				<div class="h-100" id="fin_pos_bar_chart" style="display: none;"></div>
+				<div class="h-100" id="fin_neg_bar_chart" style="display: none;"></div>
 			</div>
 		</div>	
 	</div>
@@ -263,20 +277,32 @@
 						<p>判斷資料內容為正面或負面評價。使用機器學習模型訓練出來的情緒趨勢。</p>
 					</div>
 					<div class="col-2 text-center mw-100">
-						<button type="button" class="btn btn-info">Text Cloud</button>
-						<button type="button" class="btn btn-info ml-5">Bar Chart</button>							
+						
+						<button type="button"  id="pie_chart_btn" class="btn btn-info mr-5">Pie Chart </button>
+						<button type="button"  id="cloud_word_btn" class="btn btn-info">Word Cloud </button>
+						<button type="button" id="bar_chart_btn" class="btn btn-info ml-5">Bar_Chart</button>							
 					</div>
 				</div>
 			</div>
 			<div class="col-8 h-100">
 				<!-- HTML -->
-				<div class="h-100" id="normalSentimentChart"></div>
+				<div class="h-100" style="display: block;" id="normalSentimentChart"></div>
+
+		        <!--  word cloud chart -->
+				
+				<div class="h-100 align-self-center" id="Positive_sent_wordcloud" style="display: none; border: 0px solid #eee; height: 580px; width:700px;margin:0 auto;"></div>
+				<div class="h-100 align-self-center" id="Negative_sent_wordcloud" style="display: none; border: 0px solid #eee; height: 580px; width:700px;margin:0 auto;"></div>
+
+				<!--   bar chart chart -->
+				<div class="h-100" style="display: none;" id="Positive_sent_bar"></div>
+				<div class="h-100" style="display: none;" id="Negative_sent_bar"></div>
+
 			</div>
 		</div>	
 	</div>
 
 	<!-- Trend Bubble Chart -->
-	<div class="container-fluid bg-light mt-5" style="height: 100vh;" data-aos="fade-up" data-aos-duration="800">
+	 <div class="container-fluid bg-light mt-5" style="height: 100vh;" data-aos="fade-up" data-aos-duration="800">
 		<!-- Row 1 -->
 		<div class="row h-100">
 			<div class="col-4 text-center h-100">
@@ -306,19 +332,15 @@
 		</div>	
 	</div>
 
+	<!-- js function初始化 -->
+	<script> 
+		
+		AOS.init();
+	</script>
+
+
 	<!-- Keyword Trend Chart JS -->
 	<script>
-		var data1 = []
-		var dict = {{news_trend_count|safe}};
-
-
-		for (key in dict)
-		{	
-			data1.push({"x":key, "ay":dict[key],"aValue": 10});
-		}
-
-
-
 		am4core.ready(function() {
 
 		// Themes begin
@@ -327,66 +349,71 @@
 
 		// Create chart instance
 		var chart = am4core.create("keywordTrendChart", am4charts.XYChart);
-		a={{filter_date.1}}
+
+		// Create chart instance
+
+
+		var data1 = []
+		var dict1 = {{news_trend_count|safe}};
+
+		for (key in dict1)
+		{	
+			data1.push({"date":key, "value":dict1[key]});
+		}
+
 		// Add data
 		chart.data = data1;
 
-		// Create axes
-		var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
-		xAxis.renderer.minGridDistance = 40;
+				// Set input format for the dates
+		chart.dateFormatter.inputDateFormat = "yyyy-MM-dd";
 
-		// Create value axis
-		var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		// Create axes
+		var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
 		// Create series
-		var series1 = chart.series.push(new am4charts.LineSeries());
-		series1.dataFields.valueX = "x";
-		series1.dataFields.valueY = "ay";
-		series1.dataFields.value = "aValue";
-		series1.strokeWidth = 2;
-		series1.dataFields.url = "url";
-		
+		var series = chart.series.push(new am4charts.LineSeries());
+		series.dataFields.valueY = "value";
+		series.dataFields.dateX = "date";
+		series.tooltipText = "{value}"
+		series.strokeWidth = 2;
+		series.minBulletDistance = 15;
 
-		var bullet1 = series1.bullets.push(new am4charts.CircleBullet());
-		series1.heatRules.push({
-		  target: bullet1.circle,
-		  min: 5,
-		  max: 20,
-		  property: "radius"
-		});
+		// Drop-shaped tooltips
+		series.tooltip.background.cornerRadius = 20;
+		series.tooltip.background.strokeOpacity = 0;
+		series.tooltip.pointerOrientation = "vertical";
+		series.tooltip.label.minWidth = 40;
+		series.tooltip.label.minHeight = 40;
+		series.tooltip.label.textAlign = "middle";
+		series.tooltip.label.textValign = "middle";
 
-		bullet1.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+		// Make bullets grow on hover
+		var bullet = series.bullets.push(new am4charts.CircleBullet());
+		bullet.circle.strokeWidth = 2;
+		bullet.circle.radius = 10;
+		bullet.circle.fill = am4core.color("#00BBFF");
 
-		bullet1.columns.template.interactionsEnabled = true;
-		bullet1.columns.template.events.on(
-		  "hit",
-		  ev => {
-		    var item = ev.target.dataItem.component.tooltipDataItem.dataContext;
-		    alert("line clicked on: Finish" );
-		  },
-		  this
-		);
+		var bullethover = bullet.states.create("hover");
+		bullethover.properties.scale = 1.3;
 
-		// var series2 = chart.series.push(new am4charts.LineSeries());
-		// series2.dataFields.valueX = "x";
-		// series2.dataFields.valueY = "by";
-		// series2.dataFields.value = "bValue";
-		// series2.strokeWidth = 2;
+		// Make a panning cursor
+		chart.cursor = new am4charts.XYCursor();
+		chart.cursor.behavior = "panXY";
+		chart.cursor.xAxis = dateAxis;
+		chart.cursor.snapToSeries = series;
 
-		// var bullet2 = series2.bullets.push(new am4charts.CircleBullet());
-		// series2.heatRules.push({
-		//   target: bullet2.circle,
-		//   min: 5,
-		//   max: 20,
-		//   property: "radius"
-		// });
-
-		// bullet2.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
-
-		//scrollbars
-		chart.scrollbarX = new am4core.Scrollbar();
+		// Create vertical scrollbar and place it before the value axis
 		chart.scrollbarY = new am4core.Scrollbar();
+		chart.scrollbarY.parent = chart.leftAxesContainer;
+		chart.scrollbarY.toBack();
 
+		// Create a horizontal scrollbar with previe and place it underneath the date axis
+		chart.scrollbarX = new am4charts.XYChartScrollbar();
+		chart.scrollbarX.series.push(series);
+		chart.scrollbarX.parent = chart.bottomAxesContainer;
+
+	
 		}); // end am4core.ready()
 	</script>
 
@@ -598,25 +625,15 @@
 		})
 
 		}); // end am4core.ready()
+
 	</script>
 
-	<script> 
-		AOS.init();
-	</script>
 
 
 
 	<!-- Keyword Trend  Positive  Chart JS -->
+
 	<script>
-		
-		var data2 = []
-		var dict2 = {{positive_trend_chart|safe}};
-
-		for (key in dict2)
-		{	
-			data2.push({"x":key, "ay":dict2[key],"aValue": 10});
-		}
-
 		am4core.ready(function() {
 
 		// Themes begin
@@ -625,79 +642,75 @@
 
 		// Create chart instance
 		var chart = am4core.create("PositiveTrendChart", am4charts.XYChart);
-		a={{filter_date.1}}
+
+		// Create chart instance
+
+		var data2 = []
+		var dict2 = {{positive_trend_chart|safe}};
+
+		for (key in dict2)
+		{	
+			data2.push({"date":key, "value":dict2[key],"aValue": 10});
+		}
+
 		// Add data
 		chart.data = data2;
 
-		// Create axes
-		var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
-		xAxis.renderer.minGridDistance = 40;
+				// Set input format for the dates
+		chart.dateFormatter.inputDateFormat = "yyyy-MM-dd";
 
-		// Create value axis
-		var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		// Create axes
+		var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
 		// Create series
-		var series1 = chart.series.push(new am4charts.LineSeries());
-		series1.dataFields.valueX = "x";
-		series1.dataFields.valueY = "ay";
-		series1.dataFields.value = "aValue";
-		series1.strokeWidth = 2;
-		series1.dataFields.url = "url";
-		
+		var series = chart.series.push(new am4charts.LineSeries());
+		series.dataFields.valueY = "value";
+		series.dataFields.dateX = "date";
+		series.tooltipText = "{value}"
+		series.strokeWidth = 2;
+		series.minBulletDistance = 15;
 
-		var bullet1 = series1.bullets.push(new am4charts.CircleBullet());
-		series1.heatRules.push({
-		  target: bullet1.circle,
-		  min: 5,
-		  max: 20,
-		  property: "radius"
-		});
+		// Drop-shaped tooltips
+		series.tooltip.background.cornerRadius = 20;
+		series.tooltip.background.strokeOpacity = 0;
+		series.tooltip.pointerOrientation = "vertical";
+		series.tooltip.label.minWidth = 40;
+		series.tooltip.label.minHeight = 40;
+		series.tooltip.label.textAlign = "middle";
+		series.tooltip.label.textValign = "middle";
 
-		bullet1.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+		// Make bullets grow on hover
+		var bullet = series.bullets.push(new am4charts.CircleBullet());
+		bullet.circle.strokeWidth = 2;
+		bullet.circle.radius = 10;
+		bullet.circle.fill = am4core.color("#00BBFF");
 
-		bullet1.columns.template.interactionsEnabled = true;
-		bullet1.columns.template.events.on(
-		  "hit",
-		  ev => {
-		    var item = ev.target.dataItem.component.tooltipDataItem.dataContext;
-		    alert("line clicked on: Finish" );
-		  },
-		  this
-		);
+		var bullethover = bullet.states.create("hover");
+		bullethover.properties.scale = 1.3;
 
-		// var series2 = chart.series.push(new am4charts.LineSeries());
-		// series2.dataFields.valueX = "x";
-		// series2.dataFields.valueY = "by";
-		// series2.dataFields.value = "bValue";
-		// series2.strokeWidth = 2;
+		// Make a panning cursor
+		chart.cursor = new am4charts.XYCursor();
+		chart.cursor.behavior = "panXY";
+		chart.cursor.xAxis = dateAxis;
+		chart.cursor.snapToSeries = series;
 
-		// var bullet2 = series2.bullets.push(new am4charts.CircleBullet());
-		// series2.heatRules.push({
-		//   target: bullet2.circle,
-		//   min: 5,
-		//   max: 20,
-		//   property: "radius"
-		// });
-
-		// bullet2.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
-
-		//scrollbars
-		chart.scrollbarX = new am4core.Scrollbar();
+		// Create vertical scrollbar and place it before the value axis
 		chart.scrollbarY = new am4core.Scrollbar();
+		chart.scrollbarY.parent = chart.leftAxesContainer;
+		chart.scrollbarY.toBack();
 
+		// Create a horizontal scrollbar with previe and place it underneath the date axis
+		chart.scrollbarX = new am4charts.XYChartScrollbar();
+		chart.scrollbarX.series.push(series);
+		chart.scrollbarX.parent = chart.bottomAxesContainer;
+
+	
 		}); // end am4core.ready()
 	</script>
 
-
 	<!-- Keyword Trend  Negative  Chart JS -->
 	<script>
-		var data3 = []
-		var dict3 = {{negative_trend_chart|safe}};
-
-		for (key in dict3)
-		{	
-			data3.push({"x":key, "ay":dict3[key],"aValue": 10});
-		}
 		am4core.ready(function() {
 
 		// Themes begin
@@ -707,70 +720,71 @@
 		// Create chart instance
 		var chart = am4core.create("NegativeTrendChart", am4charts.XYChart);
 
+		// Create chart instance
+
+		var data3 = []
+		var dict3 = {{negative_trend_chart|safe}};
+
+		for (key in dict3)
+		{	
+			data3.push({"date":key, "value":dict3[key],"aValue": 10});
+		}
+
 		// Add data
 		chart.data = data3;
 
-		// Create axes
-		var xAxis = chart.xAxes.push(new am4charts.ValueAxis());
-		xAxis.renderer.minGridDistance = 40;
+				// Set input format for the dates
+		chart.dateFormatter.inputDateFormat = "yyyy-MM-dd";
 
-		// Create value axis
-		var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		// Create axes
+		var dateAxis = chart.xAxes.push(new am4charts.DateAxis());
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
 		// Create series
-		var series1 = chart.series.push(new am4charts.LineSeries());
-		series1.dataFields.valueX = "x";
-		series1.dataFields.valueY = "ay";
-		series1.dataFields.value = "aValue";
-		series1.strokeWidth = 2;
-		series1.dataFields.url = "url";
-		
+		var series = chart.series.push(new am4charts.LineSeries());
+		series.dataFields.valueY = "value";
+		series.dataFields.dateX = "date";
+		series.tooltipText = "{value}"
+		series.strokeWidth = 2;
+		series.minBulletDistance = 15;
 
-		var bullet1 = series1.bullets.push(new am4charts.CircleBullet());
-		series1.heatRules.push({
-		  target: bullet1.circle,
-		  min: 5,
-		  max: 20,
-		  property: "radius"
-		});
+		// Drop-shaped tooltips
+		series.tooltip.background.cornerRadius = 20;
+		series.tooltip.background.strokeOpacity = 0;
+		series.tooltip.pointerOrientation = "vertical";
+		series.tooltip.label.minWidth = 40;
+		series.tooltip.label.minHeight = 40;
+		series.tooltip.label.textAlign = "middle";
+		series.tooltip.label.textValign = "middle";
 
-		bullet1.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
+		// Make bullets grow on hover
+		var bullet = series.bullets.push(new am4charts.CircleBullet());
+		bullet.circle.strokeWidth = 2;
+		bullet.circle.radius = 10;
+		bullet.circle.fill = am4core.color("#00BBFF");
 
-		bullet1.columns.template.interactionsEnabled = true;
-		bullet1.columns.template.events.on(
-		  "hit",
-		  ev => {
-		    var item = ev.target.dataItem.component.tooltipDataItem.dataContext;
-		    alert("line clicked on: Finish" );
-		  },
-		  this
-		);
+		var bullethover = bullet.states.create("hover");
+		bullethover.properties.scale = 1.3;
 
-		// var series2 = chart.series.push(new am4charts.LineSeries());
-		// series2.dataFields.valueX = "x";
-		// series2.dataFields.valueY = "by";
-		// series2.dataFields.value = "bValue";
-		// series2.strokeWidth = 2;
+		// Make a panning cursor
+		chart.cursor = new am4charts.XYCursor();
+		chart.cursor.behavior = "panXY";
+		chart.cursor.xAxis = dateAxis;
+		chart.cursor.snapToSeries = series;
 
-		// var bullet2 = series2.bullets.push(new am4charts.CircleBullet());
-		// series2.heatRules.push({
-		//   target: bullet2.circle,
-		//   min: 5,
-		//   max: 20,
-		//   property: "radius"
-		// });
-
-		// bullet2.tooltipText = "{valueX} x {valueY}: [bold]{value}[/]";
-
-		//scrollbars
-		chart.scrollbarX = new am4core.Scrollbar();
+		// Create vertical scrollbar and place it before the value axis
 		chart.scrollbarY = new am4core.Scrollbar();
+		chart.scrollbarY.parent = chart.leftAxesContainer;
+		chart.scrollbarY.toBack();
 
+		// Create a horizontal scrollbar with previe and place it underneath the date axis
+		chart.scrollbarX = new am4charts.XYChartScrollbar();
+		chart.scrollbarX.series.push(series);
+		chart.scrollbarX.parent = chart.bottomAxesContainer;
+
+	
 		}); // end am4core.ready()
 	</script>
-
-
-
 
 	<!-- Keyword Trend Chart Three Botton -->
 	
@@ -821,6 +835,769 @@
 		}, false);
 	</script>
 
+
+
+
+
+	<!--  Trend Chart Three Botton 金融字典按鈕設定-->
+	
+	<script>
+
+		// First Botton
+		var my_btn1 = document.querySelector('#pie_chart_btn2');
+
+		my_btn1.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#financialSentimentChart');
+  		var bk2 = document.querySelector('#fin_pos_bar_chart');
+ 		var bk3 = document.querySelector('#fin_neg_bar_chart');
+ 		var bk4 = document.querySelector('#Positive_fin_wordcloud');
+ 		var bk5 = document.querySelector('#Negative_fin_wordcloud');
+
+		  if (bk1.style.display == 'none') {
+      		bk1.style.display = 'block';
+      		bk2.style.display = 'none';
+      		bk3.style.display = 'none';
+      		bk4.style.display = 'none';
+      		bk5.style.display = 'none';
+  		} 
+		}, false);
+
+		// Second Botton
+		var my_btn2 = document.querySelector('#fin_bar_chart_btn');
+
+		my_btn2.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#financialSentimentChart');
+  		var bk2 = document.querySelector('#fin_pos_bar_chart');
+  		var bk3 = document.querySelector('#fin_neg_bar_chart');
+  		var bk4 = document.querySelector('#Positive_fin_wordcloud');
+  		var bk5 = document.querySelector('#Negative_fin_wordcloud');
+
+
+		   if (bk2.style.display == 'none' && bk3.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'block';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+  			}
+		   else if (bk2.style.display == 'block' && bk3.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'block';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+
+  			}
+		   else if  (bk2.style.display == 'none' && bk3.style.display == 'block') 
+		   {
+      		 bk2.style.display = 'block';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+  			}
+
+		}, false);
+		// Third Botton
+		// Second Botton
+		var my_btn3 = document.querySelector('#fin_cloud_word_btn');
+
+		my_btn3.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#financialSentimentChart');
+  		var bk2 = document.querySelector('#fin_pos_bar_chart');
+  		var bk3 = document.querySelector('#fin_neg_bar_chart');
+  		var bk4 = document.querySelector('#Positive_fin_wordcloud');
+  		var bk5 = document.querySelector('#Negative_fin_wordcloud');
+
+		   if (bk4.style.display == 'none' && bk5.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'block';
+      		 bk5.style.display = 'none';
+  			}
+		   else if (bk4.style.display == 'block' && bk5.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'block';
+
+  			}
+		   else if  (bk4.style.display == 'none' && bk5.style.display == 'block') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'block';
+      		 bk5.style.display = 'none';
+  			}
+
+		}, false);
+
+	</script>
+
+
+	<!-- 正向金融文字雲 -->
+	<script>
+		//取得d3顏色
+
+	     var fill = d3.scaleOrdinal(d3.schemeCategory10);
+	    //文字雲/關鍵字，及字型大小（這邊只放三個）
+	    var data12 = []
+		var dict12 = {{normlize_pos_fin|safe}};
+
+			for (key in dict12)
+			{	
+				data12.push({text:key, size:(dict12[key])*10});
+			}
+
+
+
+	    //取得呈現處的寬、高
+	    var w = parseInt(d3.select("#Positive_fin_wordcloud").style("width"), 10);
+	    var h = parseInt(d3.select("#Positive_fin_wordcloud").style("height"), 10);
+
+	    d3.layout.cloud().size([w, h])
+	            .words(data12)
+	            .padding(2)
+
+	            .rotate(function () {
+	                return ~~(Math.random() * 2) * 90;
+	            })
+	            .rotate(function () {
+	                return 0;
+	            })
+	            .font("Microsoft JhengHei") 
+	            .fontSize(function (d) {
+	                return d.size;
+	            })
+
+	            .on("end", draw)
+	            .start();
+
+	    	function draw(words) {
+	        d3.select("#Positive_fin_wordcloud").append("svg")
+	                .attr("width", w)
+	                .attr("height", h)
+	                .append("g")
+	                .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")
+	                .selectAll("text")
+	                .data(words)
+	                .enter().append("text")
+	                .style("font-size", function (d) {
+	                    return d.size + "px";
+	                })
+	                .style("font-family", "Microsoft JhengHei")
+	                .style("cursor", 'pointer')
+	                .style("fill", function (d, i) {
+	                    return fill(i);
+	                })
+	                .attr("text-anchor", "middle")
+	                .attr("transform", function (d) {
+	                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+	                })
+	                .text(function (d) {
+	                    return d.text;
+	                })
+	                .on("click", function (d) {
+	                    window.open("/pos_fin_table", '_blank');
+	                });
+	    }
+	</script>
+
+	<!-- 負向金融文字雲 -->
+	<script>
+		//取得d3顏色
+
+	     var fill = d3.scaleOrdinal(d3.schemeCategory10);
+	    //文字雲/關鍵字，及字型大小（這邊只放三個）
+	    var data13 = []
+		var dict13 = {{normlize_neg_fin|safe}};
+
+			for (key in dict13)
+			{	
+				data13.push({text:key, size:(dict13[key])*10});
+			}
+
+
+
+	    //取得呈現處的寬、高
+	    var w = parseInt(d3.select("#Negative_fin_wordcloud").style("width"), 10);
+	    var h = parseInt(d3.select("#Negative_fin_wordcloud").style("height"), 10);
+
+	    d3.layout.cloud().size([w, h])
+	            .words(data13)
+	            .padding(2)
+
+	            .rotate(function () {
+	                return ~~(Math.random() * 2) * 90;
+	            })
+	            .rotate(function () {
+	                return 0;
+	            })
+	            .font("Microsoft JhengHei") 
+	            .fontSize(function (d) {
+	                return d.size;
+	            })
+
+	            .on("end", draw)
+	            .start();
+
+	    	function draw(words) {
+	        d3.select("#Negative_fin_wordcloud").append("svg")
+	                .attr("width", w)
+	                .attr("height", h)
+	                .append("g")
+	                .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")
+	                .selectAll("text")
+	                .data(words)
+	                .enter().append("text")
+	                .style("font-size", function (d) {
+	                    return d.size + "px";
+	                })
+	                .style("font-family", "Microsoft JhengHei")
+	                .style("cursor", 'pointer')
+	                .style("fill", function (d, i) {
+	                    return fill(i);
+	                })
+	                .attr("text-anchor", "middle")
+	                .attr("transform", function (d) {
+	                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+	                })
+	                .text(function (d) {
+	                    return d.text;
+	                })
+	                .on("click", function (d) {
+	                	window.open("/neg_fin_table", '_blank');
+	                });
+	    }
+	</script>
+
+	<!-- 正向金融  bar chart code -->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+	    var data_fin_ba_chart = []
+		var dict10 = {{pos_fin_text_count|safe}};
+
+			for (key in dict10)
+			{	
+				data_fin_ba_chart.push({"country":key, "visits":dict10[key]});
+			}
+
+		// Create chart instance
+		var chart = am4core.create("fin_pos_bar_chart", am4charts.XYChart);
+		chart.scrollbarX = new am4core.Scrollbar();
+
+		// Add data
+		chart.data = data_fin_ba_chart;
+
+		// Create axes
+		var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+		categoryAxis.dataFields.category = "country";
+		categoryAxis.renderer.grid.template.location = 0;
+		categoryAxis.renderer.minGridDistance = 30;
+		categoryAxis.renderer.labels.template.horizontalCenter = "middle";
+		categoryAxis.renderer.labels.template.verticalCenter = "middle";
+		// categoryAxis.renderer.labels.template.rotation = 270;
+		categoryAxis.tooltip.disabled = true;
+		categoryAxis.renderer.minHeight = 110;
+
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		valueAxis.renderer.minWidth = 50;
+
+		// Create series
+		var series = chart.series.push(new am4charts.ColumnSeries());
+		series.sequencedInterpolation = true;
+		series.dataFields.valueY = "visits";
+		series.dataFields.categoryX = "country";
+		series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+		series.columns.template.strokeWidth = 0;
+
+		series.tooltip.pointerOrientation = "vertical";
+
+		series.columns.template.column.cornerRadiusTopLeft = 10;
+		series.columns.template.column.cornerRadiusTopRight = 10;
+		series.columns.template.column.fillOpacity = 0.8;
+
+		// on hover, make corner radiuses bigger
+		var hoverState = series.columns.template.column.states.create("hover");
+		hoverState.properties.cornerRadiusTopLeft = 0;
+		hoverState.properties.cornerRadiusTopRight = 0;
+		hoverState.properties.fillOpacity = 1;
+
+		series.columns.template.adapter.add("fill", function(fill, target) {
+		  return chart.colors.getIndex(target.dataItem.index);
+		});
+
+		// Cursor
+		chart.cursor = new am4charts.XYCursor();
+
+		}); // end am4core.ready()
+	</script>
+
+
+	<!-- 負向金融  bar chart code -->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+	    var dta11 = []
+		var dict11 = {{neg_fin_text_count|safe}};
+
+			for (key in dict11)
+			{	
+				dta11.push({"country":key, "visits":dict11[key]});
+			}
+
+		// Create chart instance
+		var chart = am4core.create("fin_neg_bar_chart", am4charts.XYChart);
+		chart.scrollbarX = new am4core.Scrollbar();
+
+		// Add data
+		chart.data = dta11;
+
+		// Create axes
+		var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+		categoryAxis.dataFields.category = "country";
+		categoryAxis.renderer.grid.template.location = 0;
+		categoryAxis.renderer.minGridDistance = 30;
+		categoryAxis.renderer.labels.template.horizontalCenter = "middle";
+		categoryAxis.renderer.labels.template.verticalCenter = "middle";
+		// categoryAxis.renderer.labels.template.rotation = 270;
+		categoryAxis.tooltip.disabled = true;
+		categoryAxis.renderer.minHeight = 110;
+
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		valueAxis.renderer.minWidth = 50;
+
+		// Create series
+		var series = chart.series.push(new am4charts.ColumnSeries());
+		series.sequencedInterpolation = true;
+		series.dataFields.valueY = "visits";
+		series.dataFields.categoryX = "country";
+		series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+		series.columns.template.strokeWidth = 0;
+
+		series.tooltip.pointerOrientation = "vertical";
+
+		series.columns.template.column.cornerRadiusTopLeft = 10;
+		series.columns.template.column.cornerRadiusTopRight = 10;
+		series.columns.template.column.fillOpacity = 0.8;
+
+		// on hover, make corner radiuses bigger
+		var hoverState = series.columns.template.column.states.create("hover");
+		hoverState.properties.cornerRadiusTopLeft = 0;
+		hoverState.properties.cornerRadiusTopRight = 0;
+		hoverState.properties.fillOpacity = 1;
+
+		series.columns.template.adapter.add("fill", function(fill, target) {
+		  return chart.colors.getIndex(target.dataItem.index);
+		});
+
+		// Cursor
+		chart.cursor = new am4charts.XYCursor();
+
+		}); // end am4core.ready()
+	</script>
+
+
+
+
+
+
+
+	<!-- sentiment Trend Chart Three Botton  情緒字典按鈕設定-->
+	
+	<script>
+
+		// First Botton
+		var my_btn1 = document.querySelector('#pie_chart_btn');
+
+		my_btn1.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#normalSentimentChart');
+  		var bk2 = document.querySelector('#Positive_sent_wordcloud');
+  		var bk3 = document.querySelector('#Negative_sent_wordcloud');
+  		var bk4 = document.querySelector('#Positive_sent_bar');
+   		var bk5 = document.querySelector('#Negative_sent_bar');
+		  if (bk1.style.display == 'none') 
+		 	{
+      		 bk1.style.display = 'block';
+      		 bk2.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+  			} 
+		}, false);
+
+		// Second Botton
+		var my_btn2 = document.querySelector('#cloud_word_btn');
+
+		my_btn2.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#normalSentimentChart');
+  		var bk2 = document.querySelector('#Positive_sent_wordcloud');
+  		var bk3 = document.querySelector('#Negative_sent_wordcloud');
+  		var bk4 = document.querySelector('#Positive_sent_bar');
+   		var bk5 = document.querySelector('#Negative_sent_bar');
+
+		   if (bk2.style.display == 'none' && bk3.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'block';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+  			}
+		   else if (bk2.style.display == 'block' && bk3.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'block';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+  			}
+		   else if  (bk2.style.display == 'none' && bk3.style.display == 'block') 
+		   {
+      		 bk2.style.display = 'block';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'none';
+  			}
+
+		}, false);
+		// Third Botton
+		var my_btn3 = document.querySelector('#bar_chart_btn');
+
+		my_btn3.addEventListener("click", function(e) {
+  		e.preventDefault();
+  		var bk1 = document.querySelector('#normalSentimentChart');
+  		var bk2 = document.querySelector('#Positive_sent_wordcloud');
+  		var bk3 = document.querySelector('#Negative_sent_wordcloud');
+  		var bk4 = document.querySelector('#Positive_sent_bar');
+  		var bk5 = document.querySelector('#Negative_sent_bar');
+
+
+		   if (bk4.style.display == 'none' && bk5.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'block';
+      		 bk5.style.display = 'none';
+  			}
+		   else if (bk4.style.display == 'block' && bk5.style.display == 'none') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'none';
+      		 bk5.style.display = 'block';
+  			}
+		   else if  (bk4.style.display == 'none' && bk5.style.display == 'block') 
+		   {
+      		 bk2.style.display = 'none';
+      		 bk1.style.display = 'none';
+      		 bk3.style.display = 'none';
+      		 bk4.style.display = 'block';
+      		 bk5.style.display = 'none';
+  			}
+		}, false);
+	</script>
+
+
+
+	<!-- 正向情緒文字雲 -->
+	<script>
+		//取得d3顏色
+
+	     var fill = d3.scaleOrdinal(d3.schemeCategory10);
+	    //文字雲/關鍵字，及字型大小（這邊只放三個）
+	    var data5 = []
+		var dict5 = {{normlize_pos|safe}};
+
+			for (key in dict5)
+			{	
+				data5.push({text:key, size:(dict5[key])*10});
+			}
+
+
+
+	    //取得呈現處的寬、高
+	    var w = parseInt(d3.select("#Positive_sent_wordcloud").style("width"), 10);
+	    var h = parseInt(d3.select("#Positive_sent_wordcloud").style("height"), 10);
+
+	    d3.layout.cloud().size([w, h])
+	            .words(data5)
+	            .padding(2)
+
+	            .rotate(function () {
+	                return ~~(Math.random() * 2) * 90;
+	            })
+	            .rotate(function () {
+	                return 0;
+	            })
+	            .font("Microsoft JhengHei") 
+	            .fontSize(function (d) {
+	                return d.size;
+	            })
+
+	            .on("end", draw)
+	            .start();
+
+	    	function draw(words) {
+	        d3.select("#Positive_sent_wordcloud").append("svg")
+	                .attr("width", w)
+	                .attr("height", h)
+	                .append("g")
+	                .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")
+	                .selectAll("text")
+	                .data(words)
+	                .enter().append("text")
+	                .style("font-size", function (d) {
+	                    return d.size + "px";
+	                })
+	                .style("font-family", "Microsoft JhengHei")
+	                .style("cursor", 'pointer')
+	                .style("fill", function (d, i) {
+	                    return fill(i);
+	                })
+	                .attr("text-anchor", "middle")
+	                .attr("transform", function (d) {
+	                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+	                })
+	                .text(function (d) {
+	                    return d.text;
+	                })
+	                .on("click", function (d) {
+	                    window.open("/pos_table", '_blank');
+	                });
+	    }
+	</script>
+
+	<!-- 負向情緒文字雲 -->
+	<script>
+		//取得d3顏色
+
+	     var fill = d3.scaleOrdinal(d3.schemeCategory10);
+	    //文字雲/關鍵字，及字型大小（這邊只放三個）
+	    var data6 = []
+		var dict6 = {{normlize_neg|safe}};
+
+			for (key in dict6)
+			{	
+				data6.push({text:key, size:(dict6[key])*10});
+			}
+
+
+
+	    //取得呈現處的寬、高
+	    var w = parseInt(d3.select("#Negative_sent_wordcloud").style("width"), 10);
+	    var h = parseInt(d3.select("#Negative_sent_wordcloud").style("height"), 10);
+
+	    d3.layout.cloud().size([w, h])
+	            .words(data6)
+	            .padding(2)
+
+	            .rotate(function () {
+	                return ~~(Math.random() * 2) * 90;
+	            })
+	            .rotate(function () {
+	                return 0;
+	            })
+	            .font("Microsoft JhengHei") 
+	            .fontSize(function (d) {
+	                return d.size;
+	            })
+
+	            .on("end", draw)
+	            .start();
+
+	    	function draw(words) {
+	        d3.select("#Negative_sent_wordcloud").append("svg")
+	                .attr("width", w)
+	                .attr("height", h)
+	                .append("g")
+	                .attr("transform", "translate(" + w / 2 + "," + h / 2 + ")")
+	                .selectAll("text")
+	                .data(words)
+	                .enter().append("text")
+	                .style("font-size", function (d) {
+	                    return d.size + "px";
+	                })
+	                .style("font-family", "Microsoft JhengHei")
+	                .style("cursor", 'pointer')
+	                .style("fill", function (d, i) {
+	                    return fill(i);
+	                })
+	                .attr("text-anchor", "middle")
+	                .attr("transform", function (d) {
+	                    return "translate(" + [d.x, d.y] + ")rotate(" + d.rotate + ")";
+	                })
+	                .text(function (d) {
+	                    return d.text;
+	                })
+	                .on("click", function (d) {
+	                    window.open("/neg_table", '_blank');
+	                });
+	    }
+	</script>
+
+
+	<!-- 正向情緒  bar chart code -->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+	    var data7 = []
+		var dict7 = {{pos_sent_text_count|safe}};
+
+			for (key in dict7)
+			{	
+				data7.push({"country":key, "visits":dict7[key]});
+			}
+
+
+
+		// Create chart instance
+		var chart = am4core.create("Positive_sent_bar", am4charts.XYChart);
+		chart.scrollbarX = new am4core.Scrollbar();
+
+		// Add data
+		chart.data = data7;
+
+		// Create axes
+		var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+		categoryAxis.dataFields.category = "country";
+		categoryAxis.renderer.grid.template.location = 0;
+		categoryAxis.renderer.minGridDistance = 30;
+		categoryAxis.renderer.labels.template.horizontalCenter = "middle";
+		categoryAxis.renderer.labels.template.verticalCenter = "middle";
+		// categoryAxis.renderer.labels.template.rotation = 270;
+		categoryAxis.tooltip.disabled = true;
+		categoryAxis.renderer.minHeight = 110;
+
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		valueAxis.renderer.minWidth = 50;
+
+		// Create series
+		var series = chart.series.push(new am4charts.ColumnSeries());
+		series.sequencedInterpolation = true;
+		series.dataFields.valueY = "visits";
+		series.dataFields.categoryX = "country";
+		series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+		series.columns.template.strokeWidth = 0;
+
+		series.tooltip.pointerOrientation = "vertical";
+
+		series.columns.template.column.cornerRadiusTopLeft = 10;
+		series.columns.template.column.cornerRadiusTopRight = 10;
+		series.columns.template.column.fillOpacity = 0.8;
+
+		// on hover, make corner radiuses bigger
+		var hoverState = series.columns.template.column.states.create("hover");
+		hoverState.properties.cornerRadiusTopLeft = 0;
+		hoverState.properties.cornerRadiusTopRight = 0;
+		hoverState.properties.fillOpacity = 1;
+
+		series.columns.template.adapter.add("fill", function(fill, target) {
+		  return chart.colors.getIndex(target.dataItem.index);
+		});
+
+		// Cursor
+		chart.cursor = new am4charts.XYCursor();
+
+		}); // end am4core.ready()
+	</script>
+
+	<!-- 負向情緒  bar chart code -->
+	<script>
+		am4core.ready(function() {
+
+		// Themes begin
+		am4core.useTheme(am4themes_animated);
+		// Themes end
+
+	    var data8 = []
+		var dict8 = {{neg_sent_text_count|safe}};
+
+			for (key in dict8)
+			{	
+				data8.push({"country":key, "visits":dict8[key]});
+			}
+
+
+
+		// Create chart instance
+		var chart = am4core.create("Negative_sent_bar", am4charts.XYChart);
+		chart.scrollbarX = new am4core.Scrollbar();
+
+		// Add data
+		chart.data = data8;
+
+		// Create axes
+		var categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+		categoryAxis.dataFields.category = "country";
+		categoryAxis.renderer.grid.template.location = 0;
+		categoryAxis.renderer.minGridDistance = 30;
+		categoryAxis.renderer.labels.template.horizontalCenter = "middle";
+		categoryAxis.renderer.labels.template.verticalCenter = "middle";
+		// categoryAxis.renderer.labels.template.rotation = 270;
+		categoryAxis.tooltip.disabled = true;
+		categoryAxis.renderer.minHeight = 110;
+
+		var valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+		valueAxis.renderer.minWidth = 50;
+
+		// Create series
+		var series = chart.series.push(new am4charts.ColumnSeries());
+		series.sequencedInterpolation = true;
+		series.dataFields.valueY = "visits";
+		series.dataFields.categoryX = "country";
+		series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+		series.columns.template.strokeWidth = 0;
+
+		series.tooltip.pointerOrientation = "vertical";
+
+		series.columns.template.column.cornerRadiusTopLeft = 10;
+		series.columns.template.column.cornerRadiusTopRight = 10;
+		series.columns.template.column.fillOpacity = 0.8;
+
+		// on hover, make corner radiuses bigger
+		var hoverState = series.columns.template.column.states.create("hover");
+		hoverState.properties.cornerRadiusTopLeft = 0;
+		hoverState.properties.cornerRadiusTopRight = 0;
+		hoverState.properties.fillOpacity = 1;
+
+		series.columns.template.adapter.add("fill", function(fill, target) {
+		  return chart.colors.getIndex(target.dataItem.index);
+		});
+
+		// Cursor
+		chart.cursor = new am4charts.XYCursor();
+
+		}); // end am4core.ready()
+	</script>
 
 
 </body>

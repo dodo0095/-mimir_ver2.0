@@ -5,6 +5,76 @@ import numpy as np
 import datetime
 import re
 
+
+def change_to_table(pos_dict_temp):
+	pos_dict=dict()
+	temp_keyword=[]
+	list1=[]
+	temp=[]
+	if len(pos_dict_temp)==1:
+		i=0
+		temp_keyword.append(pos_dict_temp[i]["keyword"])
+			#dict1={"title":pos_dict[i]['title'],"date":pos_dict[i]['date'],"href":pos_dict[i]['href'],"keyword":temp_keyword}
+		dict1={"title":pos_dict_temp[i]["title"]}
+		dict2={"date":pos_dict_temp[i]["date"]}
+		dict3={"href":pos_dict_temp[i]["href"]}
+		dict4={"keyword":temp_keyword}
+		list1=[dict1,dict2,dict3,dict4]
+		temp_keyword=[]
+		temp.append(list1)
+		list1=[]
+	for i in range(len(pos_dict_temp)-1):
+		if i ==len(pos_dict_temp)-2:
+			a=len(pos_dict_temp)-1
+			temp_keyword.append(pos_dict_temp[a]["keyword"])
+			#dict1={"title":pos_dict[i]['title'],"date":pos_dict[i]['date'],"href":pos_dict[i]['href'],"keyword":temp_keyword}
+			dict1={"title":pos_dict_temp[a]["title"]}
+			dict2={"date":pos_dict_temp[a]["date"]}
+			dict3={"href":pos_dict_temp[a]["href"]}
+			dict4={"keyword":temp_keyword}
+			list1=[dict1,dict2,dict3,dict4]
+			temp_keyword=[]
+			temp.append(list1)
+			list1=[]
+		if pos_dict_temp[i]["title"]==pos_dict_temp[i+1]["title"]:
+			temp_keyword.append(pos_dict_temp[i]["keyword"])
+		else:
+			temp_keyword.append(pos_dict_temp[i]["keyword"])
+			#dict1={"title":pos_dict[i]['title'],"date":pos_dict[i]['date'],"href":pos_dict[i]['href'],"keyword":temp_keyword}
+			print(pos_dict_temp[i]["title"],temp_keyword)
+			dict1={"title":pos_dict_temp[i]["title"]}
+			dict2={"date":pos_dict_temp[i]["date"]}
+			dict3={"href":pos_dict_temp[i]["href"]}
+			dict4={"keyword":temp_keyword}
+			list1=[dict1,dict2,dict3,dict4]
+			temp_keyword=[]
+			temp.append(list1)
+			list1=[]
+	pos_dict=temp
+	return pos_dict
+
+def pos_table(request):
+	pos_dict=request.session['pos_dict'] 
+	pos_dict=change_to_table(pos_dict)
+	return render(request, 'table.html',locals())
+
+def neg_table(request):
+	neg_dict=request.session['neg_dict'] 
+	pos_dict=change_to_table(neg_dict)
+	return render(request, 'table.html',locals())
+
+
+def neg_fin_table(request):
+	neg_fin_dict=request.session['neg_fin_dict'] 
+	pos_dict=change_to_table(neg_fin_dict)
+	return render(request, 'table.html',locals())
+
+def pos_fin_table(request):
+	pos_fin_dict=request.session['pos_fin_dict'] 
+	pos_dict=change_to_table(pos_fin_dict)
+	return render(request, 'table.html',locals())
+
+
 # Create your views here.
 def new_trend(date):
 	news_trend_count= dict()		#關鍵字趨勢的dict
@@ -17,27 +87,46 @@ def new_trend(date):
 	#print(news_trend_count)
 
 
-def sent_trend(title,content,date,sent_dict):
-	sent_trend_count= dict()		#關鍵字趨勢的dict
-	
+
+	filter_data=[]	#提取情緒字典
+	for i in range(len(title)):
+		if title[i]!="None" and href[i]!="None":
+			dict1={"title":title[i],"date":date[i],"href":href[i]}
+			
+			filter_data.append(dict1)
+
+
+def sent_trend(title,content,date,href,sent_dict):
+	sent_trend_count= dict()		#關鍵字趨勢 by date 的dict
+	sent_text_count= dict()
+	filter_data=[]
+
 	for i in range(len(date)):
 		temp=0
 		for j in range(len(sent_dict)):
-			if sent_dict[j] in title[i] or sent_dict[j] in content[i]:
+			if (sent_dict[j] in title[i] or sent_dict[j] in content[i])and len(sent_dict[j])>1:
 				temp=1
 				#print(sent_dict[j])
+				dict1={"title":title[i],"date":date[i],"href":href[i],"keyword":sent_dict[j]}
+				filter_data.append(dict1)
+				if sent_dict[j] in sent_text_count : 	
+					sent_text_count[sent_dict[j]] += 1
+				elif sent_dict[j] not in sent_text_count: 
+					sent_text_count[sent_dict[j]] =1
+
 		if temp ==1:
 			if date[i] in sent_trend_count: 	
 				sent_trend_count[date[i]] += 1
 			else:
 				sent_trend_count[date[i]] =1
+				
 		elif temp==0:
 			if date[i] in sent_trend_count: 	
 				pass
 			else:
 				sent_trend_count[date[i]] =0
 
-	return sent_trend_count
+	return sent_trend_count,sent_text_count,filter_data
 
 
 def company_count_function(company,title,content):
@@ -55,7 +144,14 @@ def company_count_function(company,title,content):
 				pass
 	return company_count
 	
-
+def normalize(d, target=50):
+    raw = sum(d.values())
+    if raw==0:
+    	raw=1
+    if len(d)==1:
+        target=10
+    factor = target/raw
+    return {key:value*factor for key,value in d.items()}
 
 def sent_dict():
 	#輸入情感字典
@@ -169,8 +265,8 @@ def range_filter(dayrange,filter_title,filter_author,filter_content,filter_date,
 		#print(someday.strftime("%m/%d"))
 	return title,author,content,date,href,pushcount
 
-def take_dic(a):
-	n = 10
+def take_dic(a,number):
+	n = number
 	L = sorted(a.items(),key=lambda item:item[1],reverse=True)
 	L = L[:n]
 	#print(L)
@@ -181,8 +277,13 @@ def take_dic(a):
 	return dictdata
 
 
+
+
+
+
 # Create your views here.
 def hello_view(request):
+
 	search = request.POST.get('search', None)
 	search=str(search)
 	if search=="None":
@@ -246,9 +347,21 @@ def hello_view(request):
 
 	news_trend_count=new_trend(date)  #make  Keyword Trend Chart   做出關鍵字趨勢圖
 	#make  positive Keyword Trend Chart   做出正向關鍵字趨勢圖
-	positive_trend_chart=sent_trend(title,content,date,pos_fin)
+	positive_trend_chart,pos_fin_text_count,pos_fin_dict=sent_trend(title,content,date,href,pos_fin)
 	#make  Negative Keyword Trend Chart   做出負向關鍵字趨勢圖
-	negative_trend_chart=sent_trend(title,content,date,neg_fin)
+	negative_trend_chart,neg_fin_text_count,neg_fin_dict=sent_trend(title,content,date,href,neg_fin)
+
+	positive_trend_chart,pos_sent_text_count,pos_dict=sent_trend(title,content,date,href,pos)
+	positive_trend_chart,neg_sent_text_count,neg_dict=sent_trend(title,content,date,href,neg)
+	pos_sent_text_count=take_dic(pos_sent_text_count,10)
+	neg_sent_text_count=take_dic(neg_sent_text_count,10)
+	pos_fin_text_count=take_dic(pos_fin_text_count,10)
+	neg_fin_text_count=take_dic(neg_fin_text_count,10)
+
+	normlize_pos=normalize(pos_sent_text_count)
+	normlize_neg=normalize(neg_sent_text_count)
+	normlize_pos_fin=normalize(pos_fin_text_count)
+	normlize_neg_fin=normalize(neg_fin_text_count)
 
 
 
@@ -263,12 +376,12 @@ def hello_view(request):
 	stopword=["正文","大量","統一","材料","國產","聯發"]
 	for i in stopword:
 		del company_count[i]
-	company_rank=take_dic(company_count)
+	company_rank=take_dic(company_count,10)
 
 
-	
-
-
-
-
+	request.session['pos_dict'] = pos_dict
+	request.session['neg_dict'] = neg_dict
+	request.session['pos_fin_dict'] = pos_fin_dict
+	request.session['neg_fin_dict'] = neg_fin_dict
+	#print(news_trend_count)
 	return render(request, 'index.html', locals())
