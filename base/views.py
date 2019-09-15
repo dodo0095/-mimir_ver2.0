@@ -285,103 +285,107 @@ def take_dic(a,number):
 def hello_view(request):
 
 	search = request.POST.get('search', None)
-	search=str(search)
+	search = str(search)
+
 	if search=="None":
-		search="新聞"
-	all_data=pttdata.objects.all()
-	alldata_title=[]
-	alldata_author=[]
-	alldata_content=[]
-	alldata_date=[]
-	alldata_href=[]
-	alldata_pushcount=[]
+		print('search=="None"')
+		# search="新聞"
+		return render(request, 'index.html', locals())
+	else:
+		all_data = pttdata.objects.all()
+		alldata_title = []
+		alldata_author = []
+		alldata_content = []
+		alldata_date = []
+		alldata_href = []
+		alldata_pushcount = []
 
 
-    #a=all_data[1].title
-	filter_title=[]
-	filter_author=[]
-	filter_content=[]
-	filter_date=[]
-	filter_href=[]
-	filter_pushcount=[]
+		#a=all_data[1].title
+		filter_title=[]
+		filter_author=[]
+		filter_content=[]
+		filter_date=[]
+		filter_href=[]
+		filter_pushcount=[]
 
-	for i in range(len(all_data)):
-		alldata_title.append(all_data[i].title)
-		alldata_author.append(all_data[i].author)
-		alldata_content.append(all_data[i].content)
+		for i in range(len(all_data)):
+			alldata_title.append(all_data[i].title)
+			alldata_author.append(all_data[i].author)
+			alldata_content.append(all_data[i].content)
 
-		temp=all_data[i].date.strftime("%m/%d")
-		alldata_date.append(str(temp))
-		alldata_href.append(all_data[i].href)
-		alldata_pushcount.append(all_data[i].pushcount) #把新聞資料濾開
-
-
-		if "新聞" in all_data[i].title:
-
-			if "Re" in all_data[i].title or "Fw" in all_data[i].title:
-
-				pass 
-			elif search in all_data[i].title:
-				filter_title.append(all_data[i].title)
-				filter_author.append(all_data[i].author)
-				filter_content.append(all_data[i].content)
-
-				temp=all_data[i].date.strftime("%m/%d")
-				filter_date.append(str(temp))
-				filter_href.append(all_data[i].href)
-				filter_pushcount.append(all_data[i].pushcount) #把新聞資料濾開
+			temp=all_data[i].date.strftime("%m/%d")
+			alldata_date.append(str(temp))
+			alldata_href.append(all_data[i].href)
+			alldata_pushcount.append(all_data[i].pushcount) #把新聞資料濾開
 
 
-	#print(filter_date)
+			if "新聞" in all_data[i].title:
+
+				if "Re" in all_data[i].title or "Fw" in all_data[i].title:
+
+					pass 
+				elif search in all_data[i].title:
+					filter_title.append(all_data[i].title)
+					filter_author.append(all_data[i].author)
+					filter_content.append(all_data[i].content)
+
+					temp=all_data[i].date.strftime("%m/%d")
+					filter_date.append(str(temp))
+					filter_href.append(all_data[i].href)
+					filter_pushcount.append(all_data[i].pushcount) #把新聞資料濾開
 
 
-	
-
-	#把全部的元素限制在過去14天
-	title,author,content,date,href,pushcount=range_filter(14,filter_title,filter_author,filter_content,filter_date,filter_href,filter_pushcount)
-
-	
-	pos,neg=sent_dict()	#提取情緒字典
-	pos_fin,neg_fin=fin_dict()	#提取金融字典
-	company=all_company_name()	#提取公司字典
-
-	news_trend_count=new_trend(date)  #make  Keyword Trend Chart   做出關鍵字趨勢圖
-	#make  positive Keyword Trend Chart   做出正向關鍵字趨勢圖
-	positive_trend_chart,pos_fin_text_count,pos_fin_dict=sent_trend(title,content,date,href,pos_fin)
-	#make  Negative Keyword Trend Chart   做出負向關鍵字趨勢圖
-	negative_trend_chart,neg_fin_text_count,neg_fin_dict=sent_trend(title,content,date,href,neg_fin)
-
-	positive_trend_chart,pos_sent_text_count,pos_dict=sent_trend(title,content,date,href,pos)
-	positive_trend_chart,neg_sent_text_count,neg_dict=sent_trend(title,content,date,href,neg)
-	pos_sent_text_count=take_dic(pos_sent_text_count,10)
-	neg_sent_text_count=take_dic(neg_sent_text_count,10)
-	pos_fin_text_count=take_dic(pos_fin_text_count,10)
-	neg_fin_text_count=take_dic(neg_fin_text_count,10)
-
-	normlize_pos=normalize(pos_sent_text_count)
-	normlize_neg=normalize(neg_sent_text_count)
-	normlize_pos_fin=normalize(pos_fin_text_count)
-	normlize_neg_fin=normalize(neg_fin_text_count)
+		#print(filter_date)
 
 
+		
+
+		#把全部的元素限制在過去14天
+		title,author,content,date,href,pushcount=range_filter(14,filter_title,filter_author,filter_content,filter_date,filter_href,filter_pushcount)
+
+		
+		pos,neg=sent_dict()	#提取情緒字典
+		pos_fin,neg_fin=fin_dict()	#提取金融字典
+		company=all_company_name()	#提取公司字典
+
+		news_trend_count=new_trend(date)  #make  Keyword Trend Chart   做出關鍵字趨勢圖
+		#make  positive Keyword Trend Chart   做出正向關鍵字趨勢圖
+		positive_trend_chart,pos_fin_text_count,pos_fin_dict=sent_trend(title,content,date,href,pos_fin)
+		#make  Negative Keyword Trend Chart   做出負向關鍵字趨勢圖
+		negative_trend_chart,neg_fin_text_count,neg_fin_dict=sent_trend(title,content,date,href,neg_fin)
+
+		positive_trend_chart,pos_sent_text_count,pos_dict=sent_trend(title,content,date,href,pos)
+		positive_trend_chart,neg_sent_text_count,neg_dict=sent_trend(title,content,date,href,neg)
+		pos_sent_text_count=take_dic(pos_sent_text_count,10)
+		neg_sent_text_count=take_dic(neg_sent_text_count,10)
+		pos_fin_text_count=take_dic(pos_fin_text_count,10)
+		neg_fin_text_count=take_dic(neg_fin_text_count,10)
+
+		normlize_pos=normalize(pos_sent_text_count)
+		normlize_neg=normalize(neg_sent_text_count)
+		normlize_pos_fin=normalize(pos_fin_text_count)
+		normlize_neg_fin=normalize(neg_fin_text_count)
 
 
-	#make  Financial pie Chart  做出金融圓餅圖
-	pos_fin_count,neg_fin_count=Fin_chart(title,content,pos_fin,neg_fin) 
-	#make  Normal pie Chart  做出情緒圓餅圖
-	pos_count,neg_count=Fin_chart(title,content,pos,neg) 
-	#make  company Bubble  Chartny   做出泡泡圖  注意泡泡圖的資訊跟上面的都不一樣。是allata
-	title,author,content,date,href,pushcount=range_filter(7,alldata_title,alldata_author,alldata_content,alldata_date,alldata_href,alldata_pushcount)
-	company_count=company_count_function(company,title,content)
-	stopword=["正文","大量","統一","材料","國產","聯發"]
-	for i in stopword:
-		del company_count[i]
-	company_rank=take_dic(company_count,10)
 
 
-	request.session['pos_dict'] = pos_dict
-	request.session['neg_dict'] = neg_dict
-	request.session['pos_fin_dict'] = pos_fin_dict
-	request.session['neg_fin_dict'] = neg_fin_dict
-	#print(news_trend_count)
-	return render(request, 'index.html', locals())
+		#make  Financial pie Chart  做出金融圓餅圖
+		pos_fin_count,neg_fin_count=Fin_chart(title,content,pos_fin,neg_fin) 
+		#make  Normal pie Chart  做出情緒圓餅圖
+		pos_count,neg_count=Fin_chart(title,content,pos,neg) 
+		#make  company Bubble  Chartny   做出泡泡圖  注意泡泡圖的資訊跟上面的都不一樣。是allata
+		title,author,content,date,href,pushcount=range_filter(7,alldata_title,alldata_author,alldata_content,alldata_date,alldata_href,alldata_pushcount)
+		company_count=company_count_function(company,title,content)
+		stopword=["正文","大量","統一","材料","國產","聯發"]
+		for i in stopword:
+			del company_count[i]
+		company_rank=take_dic(company_count,10)
+
+
+		request.session['pos_dict'] = pos_dict
+		request.session['neg_dict'] = neg_dict
+		request.session['pos_fin_dict'] = pos_fin_dict
+		request.session['neg_fin_dict'] = neg_fin_dict
+		#print(news_trend_count)
+		return render(request, 'index.html', locals())

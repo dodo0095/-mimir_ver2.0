@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 	<meta charset="UTF-8">
 	<title>Document</title>
 	<!-- Bootstrap 4 -->
@@ -19,53 +20,22 @@
 
 	<script src="https://d3js.org/d3.v5.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+	
+	{% load staticfiles %}
 
 	<!-- Styles -->
 	<style>
 		.img {  
-        width: 250px;
-        height: 125px;
-     /*text-align: 不能再视图中使其居中 css里只能识别这种星号的注释 */
-    		}	
-
-    	.search {
-        margin-top: -1cm;
-        padding-top: 5px;
-        padding-bottom: 5px;
-        padding-left: 5px;
-        border-color: blue;
-        width: 50%;
-        position:relative;
-   			 }
-
-   		.submit {
-        position:absolute;
-        margin-top: 0cm;
-        top:250px;
-        left:420px;
-        border-color: blue;
-        width: 80px;
-        height: 30px;
-            }
-
-    	.submit2 {
-        position:absolute;
-        margin-top: 0cm;
-        top:250px;
-        left:750px;
-        border-color: blue;
-        width: 150px;
-        height: 30px;
-            }
+			width: 250px;
+			height: 125px;
+    	}	
     
-
-
 		#section10 a {
 		  padding-top: 60px;
 		}
 		#section10 a span {
 		  position: absolute;
-		  top: 80vh;
+		  top: 60vh;
 		  left: 50%;
 		  width: 30px;
 		  height: 50px;
@@ -120,51 +90,50 @@
 		    opacity: 0;
 		  }
 		}
-
-		#keywordTrendContainer circle {
-
-		}
 	</style>
 </head>
 
 <body>
+	<!-- Navbar -->
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark " style="background-color: #e3f2fd;">
+		<a class="navbar-brand ml-3" href="#">HerMes</a>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		
+		<div class="navbar-collapse collapse order-3 dual-collapse2">
+			<ul class="navbar-nav ml-auto">
+				<li class="nav-item">
+					<a class="nav-link" href="#">Right</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#">Link</a>
+				</li>
+			</ul>
+		</div>
+	</nav>
 
-<nav class="navbar navbar-expand-md navbar-dark bg-dark " style="background-color: #e3f2fd;">
-    
-    <div class="mx-auto order-0">
-        <a class="navbar-brand mx-auto" href="#">MiMir</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
-        <ul class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="#">Right</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-	{% load staticfiles %}
 	<!-- Home Page -->
-	<div class="container-fluid" style="height: 100vh;">
-		<div class="row">
-			<div class="col">
-				<img class="img mt-5" src="/static/mimir5.png" style="display:block; margin:auto;"/>
+	<div class="container" style="height: 100vh;">
+		<div class="row justify-content-center">
+			<div class="col-md-6 text-center" style="margin-top: 20vh;">
 
-		        <form action=""method="post"> {% csrf_token %}
-		        <input class="search" type="text" name="search"  placeholder="在mimir上搜索或輸入您想要的關鍵字" style="display:block; margin:auto;"/>
+				<img class="img mt-0" src="/static/hermes1.png"/>
 
-		        <input class="submit"  type="submit"value="送出">
-
-		        </form>
-
-		        <input class="submit2" type="button" value="使用產業類別搜尋" onclick="location.href='https://tw.stock.yahoo.com/h/kimosel.php'">
-
+				<div class="col-12">
+					<form action=""method="post"> {% csrf_token %}
+						<input class="col search mt-3 mb-5" type="text" name="search"  placeholder="在HerMes上搜索或輸入您想要的關鍵字"/>
+						<br>
+						<div class="row justify-content-center">
+							<div class="col-5 text-center">
+								<input type="submit" class="btn btn-secondary" value="Submit">
+							</div>
+							<div class="col-7 text-center">
+								<input type="submit2" class="btn btn-secondary" value="使用產業類別搜尋" onclick="location.href='https://tw.stock.yahoo.com/h/kimosel.php'">
+							</div>	
+						</div>
+					</form>
+				</div>
 
 				<section id="section10" class="demo">
 				  <a href="#thanks"><span></span></a>
@@ -178,21 +147,21 @@
 	<div class="container-fluid bg-light" style="height: 100vh;" id="keywordTrendContainer">
 		<!-- Row 1 -->
 		<div class="row h-100">
-			<div class="col-4 text-center h-100">
+			<div class="col-md-4 text-center h-100">
 
 				<div class="row justify-content-center flex-column h-100">
 					<div class="col-6 text-center mw-100">
 						<h2 class="mt-5">關鍵字趨勢 -「{{search}}」</h2>
-						<p>透過一段時間的新聞資訊，得知關鍵字的新聞每日變化量。</p>
-					
+						<br>
+						<p>透過二週的新聞資訊，得知關鍵字的新聞每日變化量</p>
+						<p>可區分成正向以及負向時間趨勢</p>	
+						
 					</div>
+
 					<div class="col-6 text-center mw-100">
-
-
 						<button type="button" class="btn btn-info mr-5" id="Total_btn">Total Chart
 						</button>
 					
-
 						<button type="button" class="btn btn-info" id="Positive_btn">Positive
 						</button>
 
@@ -210,7 +179,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-8 h-100">
+			<div class="col-md-8 h-100">
 				
 				<!-- keywordTrendChart  HTML -->
 				<div class="h-100" style="display: block;" id="keywordTrendChart">			
@@ -241,7 +210,13 @@
 				<div class="row justify-content-center flex-column h-100">
 					<div class="col-10 text-center mw-100">
 						<h1 class="mt-5">金融用字情緒趨勢</h1>
-						<p>判斷資料內容為正面或負面評價。使用機器學習模型訓練出來針對金融用詞的情緒趨勢。</p>
+						<br>
+						<br>
+
+						<p>使用機器學習判斷資料內容為正面或負面評價</p>
+						<p>使用金融文本訓練出來針對金融用詞的情緒趨勢</p>
+						<p>提供圓餅圖、文字雲、長條圖等視覺化方式呈現</p>
+
 					</div>
 					<div class="col-2 text-center mw-100">
 						<button type="button"  id="pie_chart_btn2" class="btn btn-info mr-5">Pie Chart </button>
@@ -274,7 +249,11 @@
 				<div class="row justify-content-center flex-column h-100">
 					<div class="col-10 text-center mw-100">
 						<h1 class="mt-5">普通用字情緒趨勢</h1>
-						<p>判斷資料內容為正面或負面評價。使用機器學習模型訓練出來的情緒趨勢。</p>
+						<br>
+						<br>	
+						<p>使用機器學習判斷資料內容為正面或負面評價</p>
+						<p>使用普通領域的文本訓練出來針對日常用詞的情緒趨勢</p>
+						<p>提供圓餅圖、文字雲、長條圖等視覺化方式呈現</p>
 					</div>
 					<div class="col-2 text-center mw-100">
 						
@@ -310,7 +289,11 @@
 				<div class="row justify-content-center flex-column h-100">
 					<div class="col-6 text-center mw-100">
 						<h1 class="mt-5">趨勢泡泡圖</h1>
-						<p>在指定的時間範圍內，把提及最多的公司。</p>
+						<br>
+						<br>	
+						<p>透過二週的新聞資訊，把提及最多的公司轉成泡泡圖提供出來</p>
+						<p>讓你得知一目瞭然，最常被提及的公司是哪些</p>
+
 					</div>
 					<div class="col-4 text-center mw-100">
 						<form action="" method="">
