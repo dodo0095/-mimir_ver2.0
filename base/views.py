@@ -7,6 +7,7 @@ import re
 
 
 def change_to_table(pos_dict_temp):
+
 	pos_dict=dict()
 	temp_keyword=[]
 	list1=[]
@@ -24,6 +25,22 @@ def change_to_table(pos_dict_temp):
 		temp.append(list1)
 		list1=[]
 	for i in range(len(pos_dict_temp)-1):
+
+			
+		if pos_dict_temp[i]["title"]==pos_dict_temp[i+1]["title"]:
+			temp_keyword.append(pos_dict_temp[i]["keyword"])
+		else:
+			temp_keyword.append(pos_dict_temp[i]["keyword"])
+			#dict1={"title":pos_dict[i]['title'],"date":pos_dict[i]['date'],"href":pos_dict[i]['href'],"keyword":temp_keyword}
+			#print(pos_dict_temp[i]["title"],temp_keyword)
+			dict1={"title":pos_dict_temp[i]["title"]}
+			dict2={"date":pos_dict_temp[i]["date"]}
+			dict3={"href":pos_dict_temp[i]["href"]}
+			dict4={"keyword":temp_keyword}
+			list1=[dict1,dict2,dict3,dict4]
+			temp_keyword=[]
+			temp.append(list1)
+			list1=[]
 		if i ==len(pos_dict_temp)-2:
 			a=len(pos_dict_temp)-1
 			temp_keyword.append(pos_dict_temp[a]["keyword"])
@@ -31,20 +48,6 @@ def change_to_table(pos_dict_temp):
 			dict1={"title":pos_dict_temp[a]["title"]}
 			dict2={"date":pos_dict_temp[a]["date"]}
 			dict3={"href":pos_dict_temp[a]["href"]}
-			dict4={"keyword":temp_keyword}
-			list1=[dict1,dict2,dict3,dict4]
-			temp_keyword=[]
-			temp.append(list1)
-			list1=[]
-		if pos_dict_temp[i]["title"]==pos_dict_temp[i+1]["title"]:
-			temp_keyword.append(pos_dict_temp[i]["keyword"])
-		else:
-			temp_keyword.append(pos_dict_temp[i]["keyword"])
-			#dict1={"title":pos_dict[i]['title'],"date":pos_dict[i]['date'],"href":pos_dict[i]['href'],"keyword":temp_keyword}
-			print(pos_dict_temp[i]["title"],temp_keyword)
-			dict1={"title":pos_dict_temp[i]["title"]}
-			dict2={"date":pos_dict_temp[i]["date"]}
-			dict3={"href":pos_dict_temp[i]["href"]}
 			dict4={"keyword":temp_keyword}
 			list1=[dict1,dict2,dict3,dict4]
 			temp_keyword=[]
@@ -72,6 +75,7 @@ def neg_fin_table(request):
 def pos_fin_table(request):
 	pos_fin_dict=request.session['pos_fin_dict'] 
 	pos_dict=change_to_table(pos_fin_dict)
+
 	return render(request, 'table.html',locals())
 
 
@@ -366,7 +370,7 @@ def hello_view(request):
 		normlize_neg=normalize(neg_sent_text_count)
 		normlize_pos_fin=normalize(pos_fin_text_count)
 		normlize_neg_fin=normalize(neg_fin_text_count)
-
+		#print(pos_fin_dict)
 
 
 
@@ -377,9 +381,12 @@ def hello_view(request):
 		#make  company Bubble  Chartny   做出泡泡圖  注意泡泡圖的資訊跟上面的都不一樣。是allata
 		title,author,content,date,href,pushcount=range_filter(7,alldata_title,alldata_author,alldata_content,alldata_date,alldata_href,alldata_pushcount)
 		company_count=company_count_function(company,title,content)
-		stopword=["正文","大量","統一","材料","國產","聯發"]
+		stopword=["正文","大量","統一","材料","國產","聯發","台南"]
 		for i in stopword:
-			del company_count[i]
+			try:
+				del company_count[i]
+			except KeyError:
+				pass
 		company_rank=take_dic(company_count,10)
 
 
