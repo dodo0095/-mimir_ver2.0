@@ -128,9 +128,9 @@
 							<div class="col-5 text-center">
 								<input type="submit" class="btn btn-secondary" value="Submit">
 							</div>
-							<div class="col-7 text-center">
+						<!-- 	<div class="col-7 text-center">
 								<input type="submit2" class="btn btn-secondary" value="使用產業類別搜尋" onclick="location.href='https://tw.stock.yahoo.com/h/kimosel.php'">
-							</div>	
+							</div>	 -->
 						</div>
 					</form>
 				</div>
@@ -153,6 +153,7 @@
 					<div class="col-6 text-center mw-100">
 						<h2 class="mt-5">關鍵字趨勢 -「{{search}}」</h2>
 						<br>
+						<br>	
 						<p>透過二週的新聞資訊，得知關鍵字的新聞每日變化量</p>
 						<p>可區分成正向以及負向時間趨勢</p>	
 						
@@ -167,12 +168,15 @@
 
 						<button type="button" class="btn btn-info ml-4" id="Negative_btn">Negative</button>
 						<hr>
-						<form action="" method="">
+						<form action="" method="get">
+							<!-- 會有一個隱藏得表格。填寫上一個收尋的關鍵字 -->
+							<input type="hidden" name="search1"  value= {{search}}>
+							
 							<label >Start Date</label>
-							<input type="date" name="bday" max="3000-12-31" 
+							<input type="date" name="Start_Date" max="3000-12-31" 
 							       min="1000-01-01" class="form-control">
 							<label class="mt-2">End Date</label>
-							<input type="date" name="bday" min="1000-01-01"
+							<input type="date" name="End_Date" min="1000-01-01"
 							       max="3000-12-31" class="form-control">
 							<button type="submit" class="btn btn-primary btn-block mt-3">Submit</button>
 						</form>										
@@ -291,12 +295,14 @@
 						<h1 class="mt-5">趨勢泡泡圖</h1>
 						<br>
 						<br>	
-						<p>透過二週的新聞資訊，把提及最多的公司轉成泡泡圖提供出來</p>
+						<br>
+						<br>
+						<p>透過二週的新聞資訊，把提及最多的公司轉成泡泡圖提供</p>
 						<p>讓你得知一目瞭然，最常被提及的公司是哪些</p>
 
 					</div>
 					<div class="col-4 text-center mw-100">
-						<form action="" method="">
+<!-- 						<form action="" method="">
 							<label >Begin voorverkoop periode</label>
 							<input type="date" name="bday" max="3000-12-31" 
 							       min="1000-01-01" class="form-control">
@@ -304,7 +310,7 @@
 							<input type="date" name="bday" min="1000-01-01"
 							       max="3000-12-31" class="form-control">
 							<button type="submit" class="btn btn-primary btn-block mt-3">Submit</button>
-						</form>			
+						</form>		 -->	
 					</div>
 				</div>
 			</div>

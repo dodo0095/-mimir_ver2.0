@@ -5,6 +5,7 @@ import numpy as np
 import datetime
 import re
 
+    
 
 def change_to_table(pos_dict_temp):
 
@@ -217,8 +218,15 @@ def Fin_chart(title,content,pos_fin,neg_fin):#Financual Sentiment Chart
 
 	return pos_fin_count,neg_fin_count
 
-def range_filter(dayrange,filter_title,filter_author,filter_content,filter_date,filter_href,filter_pushcount):
-	tempday=datetime.date.today() 
+def range_filter(Start_Date,End_Date,filter_title,filter_author,filter_content,filter_date,filter_href,filter_pushcount):
+	tempday=End_Date
+	dayrange=End_Date-Start_Date
+	dayrange=(int(str(dayrange.days))+1)
+	#import datetime
+	#d1 = datetime.datetime.strptime(Start_Date, '%Y-%m-%d')
+	import datetime
+	print(Start_Date,End_Date,dayrange)
+
 	daylist=[]
 	title=[]
 	author=[]
@@ -231,8 +239,8 @@ def range_filter(dayrange,filter_title,filter_author,filter_content,filter_date,
 	temp=0
 	for j in range(dayrange):    			 #塞選二週的新聞
 		
-		someday = datetime.date.today()  #預設從當天開始算
-		day=someday.strftime("%m/%d")
+		someday = End_Date  #預設從當天開始算
+		#day=someday.strftime("%m/%d")
 
 
 		tempday += datetime.timedelta(days = -1)
@@ -291,11 +299,52 @@ def hello_view(request):
 	search = request.POST.get('search', None)
 	search = str(search)
 
-	if search=="None":
+	search1=request.GET.get('search1')
+	Start_Date=request.GET.get('Start_Date') # 获取参数值
+	End_Date=request.GET.get('End_Date')
+
+	print(search,search1)
+
+
+
+	#day_range=End_Date-Start_Date
+	#import datetime
+	#d1 = datetime.datetime.strptime(Start_Date, '%Y-%m-%d')
+	#day_range=int(str(day_range.days))
+	#print("現在時間",Start_Date,End_Date,search1)
+	#print(day_range,type(day_range))
+
+
+	if search=="None" and search1=="None":
 		print('search=="None"')
-		# search="新聞"
+		#print(search1)
+		#search="search"
 		return render(request, 'index.html', locals())
+
+
+
+
+
+
 	else:
+		print(Start_Date,End_Date,type(End_Date))
+		# if search1!="None":
+		# 	search=search1
+		# Start_Date=request.GET.get('Start_Date') # 获取参数值
+		# End_Date=request.GET.get('End_Date')
+		if Start_Date==None or End_Date==None:
+			
+			Start_Date="2019-10-10"
+			End_Date="2019-10-18"
+			Start_Date=datetime.datetime.strptime(Start_Date,"%Y-%m-%d")
+			End_Date=datetime.datetime.strptime(End_Date,"%Y-%m-%d")
+		else:
+			if search=="None":
+				search=search1
+			Start_Date=datetime.datetime.strptime(Start_Date,"%Y-%m-%d")
+			End_Date=datetime.datetime.strptime(End_Date,"%Y-%m-%d")
+
+
 		all_data = pttdata.objects.all()
 		alldata_title = []
 		alldata_author = []
@@ -329,7 +378,7 @@ def hello_view(request):
 				if "Re" in all_data[i].title or "Fw" in all_data[i].title:
 
 					pass 
-				elif search in all_data[i].title:
+				elif str(search) in all_data[i].title:
 					filter_title.append(all_data[i].title)
 					filter_author.append(all_data[i].author)
 					filter_content.append(all_data[i].content)
@@ -346,7 +395,7 @@ def hello_view(request):
 		
 
 		#把全部的元素限制在過去14天
-		title,author,content,date,href,pushcount=range_filter(14,filter_title,filter_author,filter_content,filter_date,filter_href,filter_pushcount)
+		title,author,content,date,href,pushcount=range_filter(Start_Date,End_Date,filter_title,filter_author,filter_content,filter_date,filter_href,filter_pushcount)
 
 		
 		pos,neg=sent_dict()	#提取情緒字典
@@ -379,7 +428,7 @@ def hello_view(request):
 		#make  Normal pie Chart  做出情緒圓餅圖
 		pos_count,neg_count=Fin_chart(title,content,pos,neg) 
 		#make  company Bubble  Chartny   做出泡泡圖  注意泡泡圖的資訊跟上面的都不一樣。是allata
-		title,author,content,date,href,pushcount=range_filter(7,alldata_title,alldata_author,alldata_content,alldata_date,alldata_href,alldata_pushcount)
+		title,author,content,date,href,pushcount=range_filter(Start_Date,End_Date,alldata_title,alldata_author,alldata_content,alldata_date,alldata_href,alldata_pushcount)
 		company_count=company_count_function(company,title,content)
 		stopword=["正文","大量","統一","材料","國產","聯發","台南"]
 		for i in stopword:
