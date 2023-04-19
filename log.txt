@@ -1,0 +1,19 @@
+Collecting finlab
+  Using cached finlab-0.4.1-cp38-cp38-win_amd64.whl (392 kB)
+Requirement already satisfied: pandas>=1.0.3 in c:\users\user\anaconda3\lib\site-packages (from finlab) (1.0.5)
+Collecting pyarrow>=2.0.0
+  Using cached pyarrow-11.0.0-cp38-cp38-win_amd64.whl (20.6 MB)
+Requirement already satisfied: numpy>=1.21.6 in c:\users\user\anaconda3\lib\site-packages (from finlab) (1.24.2)
+Requirement already satisfied: requests in c:\users\user\anaconda3\lib\site-packages (from finlab) (2.24.0)
+Requirement already satisfied: lz4 in c:\users\user\anaconda3\lib\site-packages (from finlab) (4.3.2)
+Requirement already satisfied: Cython in c:\users\user\anaconda3\lib\site-packages (from finlab) (0.29.21)
+Requirement already satisfied: tqdm in c:\users\user\anaconda3\lib\site-packages (from finlab) (4.47.0)
+Requirement already satisfied: python-dateutil>=2.6.1 in c:\users\user\anaconda3\lib\site-packages (from pandas>=1.0.3->finlab) (2.8.1)
+Requirement already satisfied: pytz>=2017.2 in c:\users\user\anaconda3\lib\site-packages (from pandas>=1.0.3->finlab) (2020.1)
+Requirement already satisfied: urllib3!=1.25.0,!=1.25.1,<1.26,>=1.21.1 in c:\users\user\anaconda3\lib\site-packages (from requests->finlab) (1.25.11)
+Requirement already satisfied: chardet<4,>=3.0.2 in c:\users\user\anaconda3\lib\site-packages (from requests->finlab) (3.0.4)
+Requirement already satisfied: idna<3,>=2.5 in c:\users\user\anaconda3\lib\site-packages (from requests->finlab) (2.10)
+Requirement already satisfied: certifi>=2017.4.17 in c:\users\user\anaconda3\lib\site-packages (from requests->finlab) (2020.6.20)
+Requirement already satisfied: six>=1.5 in c:\users\user\anaconda3\lib\site-packages (from python-dateutil>=2.6.1->pandas>=1.0.3->finlab) (1.15.0)
+Installing collected packages: pyarrow, finlab
+Successfully installed finlab-0.4.1 pyarrow-11.0.0
